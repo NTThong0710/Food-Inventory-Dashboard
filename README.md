@@ -1,8 +1,6 @@
-<<<<<<< HEAD
-# Food-Inventory-Dashboard
+# Food-Inventory-Dashboard / FOOD_MANAGEMENT
+
 A food inventory management dashboard with CRUD features and real-time total stock value calculation, built using Vue and Tailwind CSS.
-=======
-# FOOD_MANAGEMENT
 
 This template should help get you started developing with Vue 3 in Vite.
 
@@ -50,4 +48,3 @@ npm run build
 ```sh
 npm run lint
 ```
->>>>>>> 93a35e9 (initial committ)
