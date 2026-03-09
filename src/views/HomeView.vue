@@ -1,9 +1,3 @@
-<script setup lang="ts">
-import TheWelcome from '../components/TheWelcome.vue'
-</script>
-
 <template>
-  <main>
-    <TheWelcome />
-  </main>
+  <img src="https://vtcpay.vn/blog/wp-content/uploads/2023/03/top-nhung-bo-phim-hoat-hinh-hay-nhat-ma-ban-nen-thu-1.jpg"/>
 </template>
