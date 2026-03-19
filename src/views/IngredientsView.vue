@@ -1,125 +1,255 @@
 <template>
   <div class="flex flex-col gap-6 w-full">
+
+
+        <!-- Toast -->
+<div class="card flex justify-center">
+  <Toast position="top-center" group="headless" @close="visible = false">
+    <template #container="{ message, closeCallback }">
+      <section class="flex flex-col p-4 gap-4 w-full bg-primary/70 rounded-xl">
+        <div class="flex items-center gap-5">
+          <i class="pi pi-cloud-download text-white dark:text-black text-2xl"></i>
+          <span class="font-bold text-base text-white dark:text-black">{{ message.summary }}</span>
+        </div>
+        <div class="flex flex-col gap-2">
+          <ProgressBar :value="progress" :showValue="false" :style="{ height: '4px' }" pt:value:class="!bg-primary-50 dark:!bg-primary-900" class="bg-primary/80!"></ProgressBar>
+          <label class="text-sm font-bold text-white dark:text-black">{{ progress }}% downloaded</label>
+        </div>
+        <div class="flex gap-4 mb-4 justify-end">
+          <Button label="Cancel" size="small" @click="closeCallback"></Button>
+        </div>
+      </section>
+    </template>
+  </Toast>
+</div>
+
     <!-- Page Header -->
     <div class="flex justify-between items-center">
       <div>
-        <h2 class="text-2xl font-bold text-amber-50">Ingredients Management</h2>
+        <h2 class="text-3xl font-bold text-amber-50">Ingredients Management</h2>
         <p class="text-gray-400 text-sm mt-1">Manage all ingredients, quantities, and costs.</p>
       </div>
+
+      <div class="flex gap-2">
+        <button 
+          @click="downloadExcel" 
+          class="bg-green-500 text-black px-4 py-2 rounded font-bold hover:bg-[#37EC13] transition-colors flex items-center gap-2"
+        >
+          <Download class="w-4 h-4" aria-hidden="true" />
+          Export Excel
+        </button>
       
-      <!-- Add New Button -->
-      <button 
-        v-if="!showForm"
-        @click="openNewForm" 
-        class="bg-[#37EC13] text-[#132210] px-4 py-2 rounded font-bold hover:bg-green-500 transition-colors flex items-center gap-2"
-      >
-        <Plus class="w-5 h-5" />
-        Add Ingredient
-      </button>
+        <!-- Nút thêm mới -->
+        <button 
+          @click="openNewForm" 
+          class="bg-[#37EC13] text-[#132210] px-4 py-2 rounded font-bold hover:bg-green-500 transition-colors flex items-center gap-2"
+        >
+          <Plus class="w-5 h-5" />
+          Add Ingredient
+        </button>
+      </div>
     </div>
 
     <!-- Main Content Area -->
     <section class="w-full mt-2">
-      
-      <!-- Form Section (Conditional) -->
-      <div v-if="showForm" class="transition-all w-full max-w-4xl mx-auto">
+      <!-- List Section -->
+      <div class="transition-all w-full">
+        <!-- List -->
+        <IngredientList
+          :inventory="store.items" 
+          :isLoading="isSubmitting"
+          @edit="handleEdit" 
+          @delete="handleDelete" 
+        />
+      </div>
+
+    </section>
+
+    <!-- Form Modal -->
+    <Sheet v-model:open="isFormOpen">
+      <SheetContent side="right" class="w-full sm:max-w-2xl overflow-y-auto">
         <IngredientForm 
           :itemToEdit="editingItem" 
           @save="handleSave"
           @cancel-edit="closeForm"
         />
-      </div>
-
-      <!-- List Section (Conditional) -->
-      <div v-else class="transition-all w-full">
-        <!-- Search & Filter Section -->
-        <div class="bg-[#1F291E] p-6 rounded-xl border border-gray-700 shadow-md mb-6">
-          <div class="flex flex-col md:flex-row gap-4">
-            <input 
-              v-model="searchQuery"
-              type="text" 
-              placeholder="Search ingredients by name..."
-              class="flex-1 bg-[#121811] p-4 border border-transparent hover:border-[#37EC13] focus:outline-none focus:border-[#37EC13] transition-colors rounded text-white"
-            />
-            
-            <select 
-              v-model="selectedCategory"
-              class="bg-[#121811] p-4 border border-transparent hover:border-[#37EC13] focus:outline-none focus:border-[#37EC13] transition-colors rounded text-white min-w-50"
-            >
-              <option value="">All Categories</option>
-              <option value="produce">Produce</option>
-              <option value="m&s">Meat and Seafood</option>
-              <option value="d&e">Dairy and Eggs</option>
-              <option value="ps">Pantry Staples</option>
-              <option value="s&h">Spices and Herbs</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- List -->
-        <IngredientList 
-          :inventory="filteredInventory" 
-          @edit="handleEdit" 
-          @delete="handleDelete" 
-        />
-
-      </div>
-
-    </section>
+      </SheetContent>
+    </Sheet>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { Plus } from 'lucide-vue-next';
+import { ref, onMounted } from 'vue';
+import { Plus, Download } from 'lucide-vue-next';
 import { useInventoryStore, type Ingredient } from '@/stores/inventory';
 import IngredientForm from '@/components/inventory/IngredientForm.vue';
 import IngredientList from '@/components/inventory/IngredientList.vue';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
 
+
+import { useToast } from "primevue/usetoast";
+import ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
+
+const toast = useToast();
+const visible = ref(false);
+const progress = ref(0);
 const store = useInventoryStore();
 
-// UI State
-const showForm = ref(false);
-const editingItem = ref<Ingredient | null>(null);
-const searchQuery = ref('');
-const selectedCategory = ref('');
 
-// Filter ingredients
-const filteredInventory = computed(() => {
-  return store.items.filter(item => {
-    const matchesSearch = item.name.toLowerCase().includes(searchQuery.value.toLowerCase());
-    const matchesCategory = selectedCategory.value === '' || item.category === selectedCategory.value;
+const downloadExcel = async () => {
+  // 1. Hiện toast loading
+  if (!visible.value) {
+    toast.add({ severity: 'custom', summary: 'Generating Excel file...', group: 'headless', styleClass: 'backdrop-blur-lg rounded-2xl' });
+    visible.value = true;
+  }
+  progress.value = 0;
+
+  // Fake loading cho mượt
+  const progressInterval = setInterval(() => {
+    if (progress.value < 85) {
+      progress.value += Math.floor(Math.random() * 15) + 5; 
+    }
+  }, 150);
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 800));
+
+    // 2. Sắp xếp data theo SKU
+    const sortedItems = [...store.items].sort((a, b) => a.sku.localeCompare(b.sku));
+
+    // 3. Khởi tạo Workbook và Worksheet bằng exceljs
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Inventory Report');
+
+    // 4. Khai báo các cột và độ rộng
+    worksheet.columns = [
+      { header: 'SKU', key: 'sku', width: 15 },
+      { header: 'Ingredient Name', key: 'name', width: 30 },
+      { header: 'Category', key: 'category', width: 20 },
+      { header: 'Quantity', key: 'quantity', width: 15 },
+      { header: 'Unit', key: 'unit', width: 10 },
+      { header: 'Unit Cost (VND)', key: 'cost', width: 20 },
+      { header: 'Total Value (VND)', key: 'total', width: 20 },
+      { header: 'Production Date', key: 'prod', width: 20 },
+      { header: 'Expiry Date', key: 'exp', width: 20 }
+    ];
+
+    // 5. Thêm màu sắc và style cho hàng Tiêu đề (Header)
+    const headerRow = worksheet.getRow(1);
+    headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } }; // Chữ trắng in đậm
+    headerRow.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FF1A2E16' } // Nền xanh lá đậm (Mã màu HEX thêm FF ở đầu cho alpha channel)
+    };
+    headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+
+    // 6. Đổ data vào các hàng
+    sortedItems.forEach(item => {
+      worksheet.addRow({
+        sku: item.sku,
+        name: item.name,
+        category: item.category,
+        quantity: item.quantity,
+        unit: item.unit,
+        cost: item.cost,
+        total: item.quantity * item.cost,
+        prod: item.production_date ? new Date(item.production_date).toLocaleDateString('vi-VN') : 'N/A',
+        exp: item.expiry_date ? new Date(item.expiry_date).toLocaleDateString('vi-VN') : 'N/A'
+      });
+    });
+
+    // 7. Xuất file
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     
-    return matchesSearch && matchesCategory;
-  });
+    clearInterval(progressInterval);
+    progress.value = 100;
+
+    // Dùng file-saver tải xuống an toàn và gọn gàng hơn
+    saveAs(blob, `Inventory_Report_${new Date().getTime()}.xlsx`);
+
+    // 8. Tắt toast sau 0.5 giây
+    setTimeout(() => {
+      visible.value = false;
+      if (typeof toast.removeGroup === 'function') toast.removeGroup('headless');
+      if (typeof toast.removeAllGroups === 'function') toast.removeAllGroups();
+    }, 500);
+
+  } catch (error) {
+    console.error('Lỗi xuất Excel:', error);
+    clearInterval(progressInterval);
+    visible.value = false;
+    if (typeof toast.removeGroup === 'function') toast.removeGroup('headless');
+    if (typeof toast.removeAllGroups === 'function') toast.removeAllGroups();
+  }
+};
+// UI State
+const isFormOpen = ref(false);
+const editingItem = ref<Ingredient | null>(null);
+const isSubmitting = ref(false) // Trạng thái để disable form khi đang submit, tránh double submit hoặc đóng form giữa chừng
+
+//onMounted sẽ giống useEffect(() => {}, []) trong React, tức là useEffect mà ko có dependency nào cả
+onMounted( async() => {
+  try {
+    await store.fetchIngredients()
+  } catch(error) {
+    console.error('Failed to fetch ingredients:', error)
+  }
+  // chỗ này nên thêm Toast để user biết fetch thất bại, hoặc có thể retry fetch sau vài giây
 });
 
 const openNewForm = () => {
   editingItem.value = null;
-  showForm.value = true;
+  isFormOpen.value = true;
 };
 
 const closeForm = () => {
+  if (isSubmitting.value) return; // Không cho đóng form nếu đang lưu
   editingItem.value = null;
-  showForm.value = false;
+  isFormOpen.value = false;
 };
 
-const handleSave = (itemData: Ingredient) => {
-  if (editingItem.value) {
-    store.updateIngredient(itemData);
-  } else {
-    store.addIngredient(itemData);
+const handleSave = async (itemData: Ingredient) => {
+  if (isSubmitting.value) return; // tránh spam
+  try {
+    if (editingItem.value) {
+      await store.updateIngredient(itemData);
+    } else {
+      await store.addIngredient(itemData);
+    }
+    // Chỉ gọi lại fetchIngredients() nếu store KHÔNG tự update local state
+    // await store.fetchIngredients(); 
+    isSubmitting.value = false; // Kết thúc submit, enable form
+    closeForm();
+  } catch(error) {
+    console.error('Failed to save ingredient:', error);
+    // Show toast error cho user biết
+  } finally {
+    isSubmitting.value = false; // Đảm bảo luôn enable form dù thành công hay thất bại
   }
-  closeForm();
 };
 
 const handleEdit = (item: Ingredient) => {
-  editingItem.value = item;
-  showForm.value = true;
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  // Pass một shallow copy để tránh mutate trực tiếp store state nếu Form lỡ bind v-model thẳng vào prop
+  editingItem.value = { ...item }; 
+  isFormOpen.value = true;
 };
 
-const handleDelete = (id: number) => {
-  store.deleteIngredient(id);
+const handleDelete = async (sku: string) => {
+  // Thêm window.confirm đơn giản, hoặc dùng Modal Confirm của dự án
+  if (!window.confirm('Are you sure you want to delete this ingredient?')) return;
+  
+  try {
+    await store.deleteIngredient(sku);
+    // Show toast success
+  } catch(error) {
+    console.error('Failed to delete ingredient:', error);
+    // Show toast error
+  }
 };
+
+
+
 </script>
