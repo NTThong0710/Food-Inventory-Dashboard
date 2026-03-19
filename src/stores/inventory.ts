@@ -46,7 +46,9 @@ export const useInventoryStore = defineStore('inventory', () => {
         items.value = data.map((dbItem: any) => {
           const cat = categories.value.find(c => c.category_code == dbItem.category_code);
           const batches = dbItem.inventory_batches || [];
-          const latestBatch = batches.length > 0 ? batches[batches.length - 1] : null;
+          // Explicitly sort batches by received_at to get the latest one
+          const sortedBatches = [...batches].sort((a: any, b: any) => new Date(a.received_at).getTime() - new Date(b.received_at).getTime());
+          const latestBatch = sortedBatches.length > 0 ? sortedBatches[sortedBatches.length - 1] : null;
 
           return {
             sku: dbItem.sku,
@@ -90,6 +92,30 @@ export const useInventoryStore = defineStore('inventory', () => {
         
       if (data && Array.isArray(data) && data.length > 0) {
          const newRow = data[0];
+         
+         if (ingredient.cost > 0 || ingredient.production_date || ingredient.expiry_date) {
+            try {
+              // Fetch a default supplier for the batch FK constraint
+              const { data: sups } = await api.get('/suppliers?limit=1');
+              const defaultSupplier = (sups && sups.length > 0) ? sups[0].supplier_code : null;
+
+              if (defaultSupplier) {
+                const batchCode = `BATCH_${ingredient.sku}_${Date.now()}`;
+                await api.post('/inventory_batches', {
+                  batch_code: batchCode,
+                  ingredient_sku: ingredient.sku,
+                  supplier_code: defaultSupplier,
+                  quantity: ingredient.quantity,
+                  unit_cost: ingredient.cost || 0,
+                  production_date: ingredient.production_date || null,
+                  expiry_date: ingredient.expiry_date || null
+                });
+              }
+            } catch (batchErr) {
+              console.error('Error adding batch:', batchErr);
+            }
+         }
+
          const cat = categories.value.find(c => c.category_code == newRow.category_code);
          items.value.unshift({
             sku: newRow.sku,
@@ -98,9 +124,9 @@ export const useInventoryStore = defineStore('inventory', () => {
             category_code: newRow.category_code,
             quantity: newRow.stock_quantity,
             unit: newRow.unit,
-            cost: 0,
-            production_date: undefined,
-            expiry_date: undefined,
+            cost: ingredient.cost || 0,
+            production_date: ingredient.production_date,
+            expiry_date: ingredient.expiry_date,
             note: ''
          });
       }
@@ -117,6 +143,37 @@ export const useInventoryStore = defineStore('inventory', () => {
         unit: ingredient.unit,
         stock_quantity: ingredient.quantity
       });
+
+      try {
+        // Try to find if a batch exists for this sku
+        const { data: existingBatches } = await api.get(`/inventory_batches?ingredient_sku=eq.${ingredient.sku}&order=received_at.desc&limit=1`);
+        if (existingBatches && existingBatches.length > 0) {
+          await api.patch(`/inventory_batches?batch_code=eq.${existingBatches[0].batch_code}`, {
+            quantity: ingredient.quantity,
+            unit_cost: ingredient.cost || 0,
+            production_date: ingredient.production_date || null,
+            expiry_date: ingredient.expiry_date || null
+          });
+        } else {
+          const { data: sups } = await api.get('/suppliers?limit=1');
+          const defaultSupplier = (sups && sups.length > 0) ? sups[0].supplier_code : null;
+
+          if (defaultSupplier) {
+            const batchCode = `BATCH_${ingredient.sku}_${Date.now()}`;
+            await api.post('/inventory_batches', {
+              batch_code: batchCode,
+              ingredient_sku: ingredient.sku,
+              supplier_code: defaultSupplier,
+              quantity: ingredient.quantity,
+              unit_cost: ingredient.cost || 0,
+              production_date: ingredient.production_date || null,
+              expiry_date: ingredient.expiry_date || null
+            });
+          }
+        }
+      } catch (batchErr) {
+        console.error('Error updating ingredient batch:', batchErr);
+      }
 
       const index = items.value.findIndex(item => item.sku === ingredient.sku);
       if (index !== -1) {

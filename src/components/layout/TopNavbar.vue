@@ -15,28 +15,28 @@
           class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
           :class="$route.path === '/dashboard' ? 'bg-[#1B5E20] text-[#37EC13] shadow-sm' : 'text-gray-400 hover:text-gray-200 hover:bg-[#1B241D]'"
         >
-          Dashboard
+          Tổng quan
         </router-link>
         <router-link 
           to="/ingredients" 
           class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
           :class="$route.path.startsWith('/ingredients') ? 'bg-[#1B5E20] text-[#37EC13] shadow-sm' : 'text-gray-400 hover:text-gray-200 hover:bg-[#1B241D]'"
         >
-          Ingredients
+          Nguyên liệu
         </router-link>
         <router-link 
           to="/dishes" 
           class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
           :class="$route.path.startsWith('/dishes') ? 'bg-[#1B5E20] text-[#37EC13] shadow-sm' : 'text-gray-400 hover:text-gray-200 hover:bg-[#1B241D]'"
         >
-          Dishes
+          Món ăn
         </router-link>
         <router-link 
           to="/suppliers" 
           class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
           :class="$route.path.startsWith('/suppliers') ? 'bg-[#1B5E20] text-[#37EC13] shadow-sm' : 'text-gray-400 hover:text-gray-200 hover:bg-[#1B241D]'"
         >
-          Suppliers
+          Nhà cung cấp
         </router-link>
       </div>
 
@@ -53,14 +53,14 @@
       </router-link>
       <!-- Theme Toggle Button -->
       <button
-        @click="themeStore.toggleTheme"
-        class="p-2 text-gray-400 hover:text-gray-200 hover:bg-[#1B241D] rounded-lg transition-colors"
+        @click="toggleTheme"
+        class="p-2 text-gray-400 hover:text-gray-200 hover:bg-[#1B241D] rounded-lg transition-colors relative transition-theme-btn"
         :title="themeStore.isDark ? 'Chế độ sáng' : 'Chế độ tối'"
       >
         <Sun v-if="themeStore.isDark" class="w-5 h-5 text-yellow-400" />
         <Moon v-else class="w-5 h-5 text-blue-400" />
       </button>
-      <button @click="handleLogout" class="p-2 text-red-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors" title="Sign Out" aria-label="Sign Out">
+      <button @click="handleLogout" class="p-2 text-red-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors" title="Đăng xuất" aria-label="Sign Out">
         <LogOut class="w-5 h-5" aria-hidden="true" />
       </button>
     </div>
@@ -69,7 +69,7 @@
 
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
-import { computed } from 'vue'
+import { computed, nextTick } from 'vue'
 import { Utensils, LogOut, Sun, Moon } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
 import { useThemeStore } from '@/stores/theme'
@@ -90,5 +90,55 @@ const userInitial = computed(() => {
 const handleLogout = async () => {
   await authStore.logout()
   router.push('/login')
+}
+
+/**
+ * Hiệu ứng lan tỏa (ripple) khi chuyển chế độ sáng/tối
+ */
+const toggleTheme = async (event: MouseEvent) => {
+  // Kiểm tra xem trình duyệt có hỗ trợ View Transition API không
+  if (!document.startViewTransition) {
+    themeStore.toggleTheme()
+    return
+  }
+
+  // Lấy tọa độ click
+  const x = event.clientX
+  const y = event.clientY
+  
+  // Tính toán bán kính tối đa (đường chéo màn hình từ điểm click)
+  const endRadius = Math.hypot(
+    Math.max(x, window.innerWidth - x),
+    Math.max(y, window.innerHeight - y)
+  )
+
+  // Bắt đầu view transition
+  const transition = document.startViewTransition(async () => {
+    themeStore.toggleTheme()
+    // Đợi Vue cập nhật DOM
+    await nextTick()
+  })
+
+  // Chờ cho transition sẵn sàng
+  await transition.ready
+
+  // Thực hiện animation clip-path
+  const isDark = themeStore.isDark
+  
+  document.documentElement.animate(
+    {
+      clipPath: [
+        `circle(0px at ${x}px ${y}px)`,
+        `circle(${endRadius}px at ${x}px ${y}px)`
+      ]
+    },
+    {
+      duration: 500,
+      easing: 'ease-in-out',
+      // Nếu chuyển sang tối, animate element mới (dark)
+      // Nếu chuyển sang sáng, animate element mới (light)
+      pseudoElement: '::view-transition-new(root)'
+    }
+  )
 }
 </script>

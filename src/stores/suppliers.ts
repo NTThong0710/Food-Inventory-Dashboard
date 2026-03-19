@@ -2,6 +2,13 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { api } from '@/lib/axios';
 
+export interface SupplierIngredient {
+  ingredient_sku: string;
+  ingredient_name?: string;
+  quoted_price: number;
+  lead_time_days: number;
+}
+
 export interface Supplier {
   supplier_code: string;
   name: string;
@@ -10,6 +17,7 @@ export interface Supplier {
   phone: string;
   address: string;
   status: 'Active' | 'Inactive';
+  ingredients?: SupplierIngredient[];
 }
 
 export const useSuppliersStore = defineStore('suppliers', () => {
@@ -19,10 +27,20 @@ export const useSuppliersStore = defineStore('suppliers', () => {
   async function fetchSuppliers() {
     isLoading.value = true;
     try {
-      const { data } = await api.get('/suppliers?order=created_at.desc');
+      const { data } = await api.get('/suppliers?select=*,supplier_ingredients(ingredient_sku,quoted_price,lead_time_days,ingredients(name))&order=created_at.desc');
 
       if (data && Array.isArray(data)) {
-        items.value = data as Supplier[];
+        items.value = data.map((dbSup: any) => {
+          return {
+            ...dbSup,
+            ingredients: (dbSup.supplier_ingredients || []).map((si: any) => ({
+              ingredient_sku: si.ingredient_sku,
+              ingredient_name: si.ingredients ? si.ingredients.name : 'Unknown',
+              quoted_price: si.quoted_price,
+              lead_time_days: si.lead_time_days
+            }))
+          };
+        });
       }
     } catch (error) {
       console.error('Error fetching suppliers:', error);
@@ -48,6 +66,17 @@ export const useSuppliersStore = defineStore('suppliers', () => {
 
       if (data && Array.isArray(data) && data.length > 0) {
         supplier.supplier_code = data[0].supplier_code;
+        
+        if (supplier.ingredients && supplier.ingredients.length > 0) {
+           const ingredientsToInsert = supplier.ingredients.map(ing => ({
+             supplier_code: supplier.supplier_code,
+             ingredient_sku: ing.ingredient_sku,
+             quoted_price: ing.quoted_price,
+             lead_time_days: ing.lead_time_days
+           }));
+           await api.post('/supplier_ingredients', ingredientsToInsert);
+        }
+
         items.value.unshift(supplier);
       }
     } catch (error) {
@@ -65,6 +94,18 @@ export const useSuppliersStore = defineStore('suppliers', () => {
         address: supplier.address,
         status: supplier.status
       });
+
+      await api.delete(`/supplier_ingredients?supplier_code=eq.${supplier.supplier_code}`);
+      
+      if (supplier.ingredients && supplier.ingredients.length > 0) {
+        const ingredientsToInsert = supplier.ingredients.map(ing => ({
+          supplier_code: supplier.supplier_code,
+          ingredient_sku: ing.ingredient_sku,
+          quoted_price: ing.quoted_price,
+          lead_time_days: ing.lead_time_days
+        }));
+        await api.post('/supplier_ingredients', ingredientsToInsert);
+      }
 
       const index = items.value.findIndex(item => item.supplier_code === supplier.supplier_code);
       if (index !== -1) {

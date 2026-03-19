@@ -13,10 +13,10 @@
         </div>
         <div class="flex flex-col gap-2">
           <ProgressBar :value="progress" :showValue="false" :style="{ height: '4px' }" pt:value:class="!bg-primary-50 dark:!bg-primary-900" class="bg-primary/80!"></ProgressBar>
-          <label class="text-sm font-bold text-white dark:text-black">{{ progress }}% downloaded</label>
+          <label class="text-sm font-bold text-white dark:text-black">{{ progress }}% đã tải</label>
         </div>
         <div class="flex gap-4 mb-4 justify-end">
-          <Button label="Cancel" size="small" @click="closeCallback"></Button>
+          <Button label="Hủy" size="small" @click="closeCallback"></Button>
         </div>
       </section>
     </template>
@@ -26,8 +26,8 @@
     <!-- Page Header -->
     <div class="flex justify-between items-center">
       <div>
-        <h2 class="text-3xl font-bold text-amber-50">Ingredients Management</h2>
-        <p class="text-gray-400 text-sm mt-1">Manage all ingredients, quantities, and costs.</p>
+        <h2 class="text-3xl font-bold text-amber-50">Quản lý nguyên liệu</h2>
+        <p class="text-gray-400 text-sm mt-1">Quản lý tất cả nguyên liệu, số lượng và chi phí.</p>
       </div>
 
       <div class="flex gap-2">
@@ -36,7 +36,7 @@
           class="bg-green-500 text-black px-4 py-2 rounded font-bold hover:bg-[#37EC13] transition-colors flex items-center gap-2"
         >
           <Download class="w-4 h-4" aria-hidden="true" />
-          Export Excel
+          Xuất Excel
         </button>
       
         <!-- Nút thêm mới -->
@@ -45,7 +45,7 @@
           class="bg-[#37EC13] text-[#132210] px-4 py-2 rounded font-bold hover:bg-green-500 transition-colors flex items-center gap-2"
         >
           <Plus class="w-5 h-5" />
-          Add Ingredient
+          Thêm nguyên liệu
         </button>
       </div>
     </div>
@@ -88,6 +88,9 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 
 
 import { useToast } from "primevue/usetoast";
+import Toast from 'primevue/toast';
+import ProgressBar from 'primevue/progressbar';
+import Button from 'primevue/button';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 
@@ -100,7 +103,7 @@ const store = useInventoryStore();
 const downloadExcel = async () => {
   // 1. Hiện toast loading
   if (!visible.value) {
-    toast.add({ severity: 'custom', summary: 'Generating Excel file...', group: 'headless', styleClass: 'backdrop-blur-lg rounded-2xl' });
+    toast.add({ severity: 'custom', summary: 'Đang tạo file Excel...', group: 'headless', styleClass: 'backdrop-blur-lg ' });
     visible.value = true;
   }
   progress.value = 0;
@@ -120,19 +123,19 @@ const downloadExcel = async () => {
 
     // 3. Khởi tạo Workbook và Worksheet bằng exceljs
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('Inventory Report');
+    const worksheet = workbook.addWorksheet('Báo cáo kho');
 
     // 4. Khai báo các cột và độ rộng
     worksheet.columns = [
-      { header: 'SKU', key: 'sku', width: 15 },
-      { header: 'Ingredient Name', key: 'name', width: 30 },
-      { header: 'Category', key: 'category', width: 20 },
-      { header: 'Quantity', key: 'quantity', width: 15 },
-      { header: 'Unit', key: 'unit', width: 10 },
-      { header: 'Unit Cost (VND)', key: 'cost', width: 20 },
-      { header: 'Total Value (VND)', key: 'total', width: 20 },
-      { header: 'Production Date', key: 'prod', width: 20 },
-      { header: 'Expiry Date', key: 'exp', width: 20 }
+      { header: 'Mã (SKU)', key: 'sku', width: 25 },
+      { header: 'Tên nguyên liệu', key: 'name', width: 30 },
+      { header: 'Danh mục', key: 'category', width: 20 },
+      { header: 'Số lượng', key: 'quantity', width: 15 },
+      { header: 'Đơn vị', key: 'unit', width: 10 },
+      { header: 'Đơn giá (VND)', key: 'cost', width: 20 },
+      { header: 'Tổng giá trị (VND)', key: 'total', width: 20 },
+      { header: 'Ngày sản xuất', key: 'prod', width: 20 },
+      { header: 'Ngày hết hạn', key: 'exp', width: 20 }
     ];
 
     // 5. Thêm màu sắc và style cho hàng Tiêu đề (Header)
@@ -155,8 +158,8 @@ const downloadExcel = async () => {
         unit: item.unit,
         cost: item.cost,
         total: item.quantity * item.cost,
-        prod: item.production_date ? new Date(item.production_date).toLocaleDateString('vi-VN') : 'N/A',
-        exp: item.expiry_date ? new Date(item.expiry_date).toLocaleDateString('vi-VN') : 'N/A'
+        prod: item.production_date ? new Date(item.production_date).toLocaleDateString('vi-VN') : '-',
+        exp: item.expiry_date ? new Date(item.expiry_date).toLocaleDateString('vi-VN') : '-'
       });
     });
 
@@ -168,7 +171,7 @@ const downloadExcel = async () => {
     progress.value = 100;
 
     // Dùng file-saver tải xuống an toàn và gọn gàng hơn
-    saveAs(blob, `Inventory_Report_${new Date().getTime()}.xlsx`);
+    saveAs(blob, `Bao_cao_kho_${new Date().getTime()}.xlsx`);
 
     // 8. Tắt toast sau 0.5 giây
     setTimeout(() => {
@@ -212,7 +215,17 @@ const closeForm = () => {
 };
 
 const handleSave = async (itemData: Ingredient) => {
-  if (isSubmitting.value) return; // tránh spam
+  if (isSubmitting.value) return; 
+
+  if (!editingItem.value) {
+    const isDuplicate = store.items.some(item => item.sku.toLowerCase() === itemData.sku.toLowerCase());
+    if (isDuplicate) {
+      toast.add({ severity: 'error', summary: 'Lỗi', detail: 'Mã SKU đã tồn tại', life: 3000 });
+      return;
+    }
+  }
+
+  isSubmitting.value = true;
   try {
     if (editingItem.value) {
       await store.updateIngredient(itemData);
@@ -220,7 +233,7 @@ const handleSave = async (itemData: Ingredient) => {
       await store.addIngredient(itemData);
     }
     // Chỉ gọi lại fetchIngredients() nếu store KHÔNG tự update local state
-    // await store.fetchIngredients(); 
+    await store.fetchIngredients(); 
     isSubmitting.value = false; // Kết thúc submit, enable form
     closeForm();
   } catch(error) {
@@ -239,7 +252,7 @@ const handleEdit = (item: Ingredient) => {
 
 const handleDelete = async (sku: string) => {
   // Thêm window.confirm đơn giản, hoặc dùng Modal Confirm của dự án
-  if (!window.confirm('Are you sure you want to delete this ingredient?')) return;
+  if (!window.confirm('Bạn có chắc chắn muốn xóa nguyên liệu này không?')) return;
   
   try {
     await store.deleteIngredient(sku);

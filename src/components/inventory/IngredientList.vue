@@ -13,7 +13,7 @@
             @input="handleSearch"
             type="text" 
             class="w-full bg-[#132210] border border-[#2A362C] text-[#A1B99D] text-sm rounded-lg focus:ring-[#37EC13] focus:border-[#37EC13] block pl-10 p-2.5 placeholder-gray-500 transition-colors" 
-            placeholder="Search ingredients, categories..."
+            placeholder="Tìm kiếm nguyên liệu, danh mục..."
           >
         </div>
         
@@ -21,7 +21,7 @@
         <div class="relative">
           <button @click="toggleFilter" @blur="closeFilterDelay" :aria-expanded="showFilterMenu" class="flex items-center gap-2 px-4 py-2.5 bg-[#132210] border border-[#2A362C] rounded-lg text-sm font-medium hover:bg-[#232F26] transition-colors whitespace-nowrap">
             <Filter class="w-4 h-4" />
-            <span class="hidden sm:inline">{{ selectedCategory === 'All' ? 'Filter' : selectedCategory }}</span>
+            <span class="hidden sm:inline">{{ selectedCategory === 'All' ? 'Lọc' : selectedCategory }}</span>
           </button>
           
           <transition name="fade">
@@ -44,7 +44,7 @@
 <div class="relative">
   <button @click="toggleSortMenu" @blur="closeSortMenu" :aria-expanded="showSortMenu" class="flex items-center gap-2 px-4 py-2.5 bg-[#132210] border border-[#2A362C] rounded-lg text-sm font-medium hover:bg-[#232F26] transition-colors whitespace-nowrap">
     <ArrowUpDown class="w-4 h-4" />
-    <span class="hidden sm:inline">Sort: {{ sortField === 'name' ? 'Name' : sortField === 'cost' ? 'Price' : 'Quantity' }}</span>
+    <span class="hidden sm:inline">Sắp xếp: {{ sortField === 'name' ? 'Tên' : sortField === 'cost' ? 'Giá' : 'Số lượng' }}</span>
     <span class="ml-1 text-xs" :class="sortOrder === 'asc' ? 'text-[#37EC13]' : 'text-orange-400'">
       ({{ sortOrder === 'asc' ? '↑' : '↓' }})
     </span>
@@ -58,11 +58,11 @@
         class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-[#2A362C] hover:text-white transition-colors flex items-center justify-between"
       >
         <span class="flex items-center gap-2">
-          <span>Name</span>
+          <span>Tên</span>
         </span>
         <div class="flex items-center gap-1">
           <span v-if="sortField === 'name'" class="text-[#37EC13] text-xs">
-            {{ sortOrder === 'asc' ? '↑ Ascending' : '↓ Descending' }}
+            {{ sortOrder === 'asc' ? '↑ Tăng dần' : '↓ Giảm dần' }}
           </span>
           <Check v-if="sortField === 'name'" class="w-4 h-4 text-[#37EC13]" />
         </div>
@@ -74,11 +74,11 @@
         class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-[#2A362C] hover:text-white transition-colors flex items-center justify-between"
       >
         <span class="flex items-center gap-2">
-          <span>Price</span>
+          <span>Giá</span>
         </span>
         <div class="flex items-center gap-1">
           <span v-if="sortField === 'cost'" class="text-[#37EC13] text-xs">
-            {{ sortOrder === 'asc' ? '↑ Ascending' : '↓ Descending' }}
+            {{ sortOrder === 'asc' ? '↑ Tăng dần' : '↓ Giảm dần' }}
           </span>
           <Check v-if="sortField === 'cost'" class="w-4 h-4 text-[#37EC13]" />
         </div>
@@ -90,11 +90,11 @@
         class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-[#2A362C] hover:text-white transition-colors flex items-center justify-between"
       >
         <span class="flex items-center gap-2">
-          <span>Quantity</span>
+          <span>Số lượng</span>
         </span>
         <div class="flex items-center gap-1">
           <span v-if="sortField === 'quantity'" class="text-[#37EC13] text-xs">
-            {{ sortOrder === 'asc' ? '↑ Ascending' : '↓ Descending' }}
+            {{ sortOrder === 'asc' ? '↑ Tăng dần' : '↓ Giảm dần' }}
           </span>
           <Check v-if="sortField === 'quantity'" class="w-4 h-4 text-[#37EC13]" />
         </div>
@@ -108,9 +108,9 @@
         @click="toggleSortOrder"
         class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-[#2A362C] hover:text-white transition-colors flex items-center justify-between"
       >
-        <span>Toggle Order</span>
+        <span>Đổi chiều</span>
         <span class="text-xs" :class="sortOrder === 'asc' ? 'text-[#37EC13]' : 'text-orange-400'">
-          {{ sortOrder === 'asc' ? '↑ Ascending' : '↓ Descending' }}
+          {{ sortOrder === 'asc' ? '↑ Tăng dần' : '↓ Giảm dần' }}
         </span>
       </button>
     </div>
@@ -120,20 +120,20 @@
 
       </div>
       <div class="text-gray-400 text-sm">
-        Showing <span class="text-white font-bold">{{ Math.min(paginatedInventory.length, (currentPage - 1) * itemsPerPage + 1) }}-{{ Math.min(currentPage * itemsPerPage, filteredInventory.length) }}</span> of <span class="text-white font-bold">{{ filteredInventory.length }}</span> ingredients
+        Đang hiển thị <span class="text-white font-bold">{{ Math.min(paginatedInventory.length, (currentPage - 1) * itemsPerPage + 1) }}-{{ Math.min(currentPage * itemsPerPage, filteredInventory.length) }}</span> trên <span class="text-white font-bold">{{ filteredInventory.length }}</span> nguyên liệu
       </div>
     </div>
 
     <!-- Table Header (Hidden on small screens) -->
     <div class="hidden md:grid grid-cols-[2fr_0.5fr_1.5fr_1.5fr_2fr_1fr_1fr_40px] gap-4 px-6 py-4 border-b border-[#2A362C] bg-[#152512] text-xs font-bold text-gray-500 uppercase tracking-wider">
-      <div>Ingredient Name</div>
-      <div>Unit</div>
-      <div class="flex justify-center">Price / Unit</div>
-      <div>Category</div>
-      <div class="flex justify-center">Stock Level</div>
-      <div class="flex justify-center">Prod Date</div>
-      <div>Exp Date</div>
-      <div class="flex justify-center">Actions</div>
+      <div>Tên nguyên liệu</div>
+      <div>Đơn vị</div>
+      <div class="flex justify-center">Đơn giá</div>
+      <div>Danh mục</div>
+      <div class="flex justify-center">Tồn kho</div>
+      <div class="flex justify-center">Ngày SX</div>
+      <div>Hạn sử dụng</div>
+      <div class="flex justify-center">Thao tác</div>
     </div>
 
     <!-- Empty State -->
@@ -142,7 +142,7 @@
       <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#1B241D] mb-4">
         <PackageX class="w-8 h-8 text-gray-500" />
       </div>
-      <p>No ingredients found. Add some to build your inventory.</p>
+      <p>Không tìm thấy nguyên liệu. Vui lòng thêm nguyên liệu mới.</p>
     </div>
 
     <!-- Table Body -->
@@ -163,7 +163,7 @@
 
         <!-- Unit & Mobile labels handled by responsive classes -->
         <div class="flex flex-col md:flex-row md:items-center mt-2 md:mt-0 gap-1.5 md:gap-0">
-          <span class="text-xs text-gray-500 md:hidden uppercase font-bold">Unit:</span>
+          <span class="text-xs text-gray-500 md:hidden uppercase font-bold">Đơn vị:</span>
           <span class="px-2.5 py-1 text-xs font-medium bg-[#1B241D] border border-[#2A362C] text-gray-300 rounded-md w-fit">
             {{ item.unit }}
           </span>
@@ -171,7 +171,7 @@
 
         <!-- Price -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-center mt-2 md:mt-0 gap-1.5 md:gap-0">
-          <span class="text-xs text-gray-500 md:hidden uppercase font-bold">Price:</span>
+          <span class="text-xs text-gray-500 md:hidden uppercase font-bold">Đơn giá:</span>
           <span class="font-medium text-gray-200">
             {{ formatVND(item.cost) }}
           </span>
@@ -179,7 +179,7 @@
 
         <!-- Category -->
         <div class="flex flex-col md:flex-row md:items-center mt-2 md:mt-0 gap-1.5 md:gap-0">
-          <span class="text-xs text-gray-500 md:hidden uppercase font-bold">Category:</span>
+          <span class="text-xs text-gray-500 md:hidden uppercase font-bold">Danh mục:</span>
           <div class="flex items-center gap-2 px-3 py-1 bg-[#1B241D]/50 border border-[#2A362C]/50 rounded-full text-xs font-medium w-fit"
                :class="getCategoryColorClass(item.category)">
             <div class="w-1.5 h-1.5 rounded-full" :class="getCategoryBgClass(item.category)"></div>
@@ -204,13 +204,13 @@
 
         <!-- Production Date -->
         <div class="flex flex-col md:flex-row md:items-center justify-center mt-2 md:mt-0 gap-1.5 md:gap-0">
-          <span class="text-xs text-gray-500 md:hidden uppercase font-bold">Prod:</span>
+          <span class="text-xs text-gray-500 md:hidden uppercase font-bold">Ngày SX:</span>
           <span class="text-sm text-gray-300">{{ formatDate(item.production_date) }}</span>
         </div>
 
         <!-- Expiry Date -->
         <div class="flex flex-col md:flex-row md:items-center mt-2 md:mt-0 gap-1.5 md:gap-0">
-          <span class="text-xs text-gray-500 md:hidden uppercase font-bold">Exp:</span>
+          <span class="text-xs text-gray-500 md:hidden uppercase font-bold">Hạn sử dụng:</span>
           <span class="text-sm" :class="getExpiryColor(item.expiry_date)">{{ formatDate(item.expiry_date) }}</span>
         </div>
 
@@ -225,11 +225,11 @@
             <transition name="fade">
               <div v-if="activeMenu === item.sku" class="absolute right-0 top-full mt-1 w-32 bg-[#1B241D] border border-[#2A362C] rounded-lg shadow-xl z-20 py-1 flex flex-col">
                 <button @click.stop="$emit('edit', item); activeMenu = null" class="flex items-center gap-2 w-full px-4 py-2 text-sm text-left text-gray-300 hover:bg-[#2A362C] hover:text-white transition-colors">
-                  <Pencil class="w-4 h-4" /> Edit
+                  <Pencil class="w-4 h-4" /> Sửa
                 </button>
                 <div class="h-px bg-[#2A362C] my-1 w-full"></div>
                 <button @click.stop="$emit('delete', item.sku); activeMenu = null" class="flex items-center gap-2 w-full px-4 py-2 text-sm text-left text-red-400 hover:bg-[#2A362C] hover:text-red-300 transition-colors">
-                  <Trash2 class="w-4 h-4" /> Delete
+                  <Trash2 class="w-4 h-4" /> Xóa
                 </button>
               </div>
             </transition>
@@ -242,7 +242,7 @@
     <!-- Pagination Footer -->
     <div v-if="filteredInventory.length > 0" class="p-4 sm:p-6 flex flex-col sm:flex-row justify-between items-center bg-[#132210] rounded-b-xl mt-auto">
       <div class="text-gray-400 text-sm mb-4 sm:mb-0 whitespace-nowrap">
-        Viewing <span class="text-white font-bold">{{ paginationTextStart }}</span> to <span class="text-white font-bold">{{ paginationTextEnd }}</span> of <span class="text-white font-bold">{{ filteredInventory.length }}</span> results
+        Đang hiển thị <span class="text-white font-bold">{{ paginationTextStart }}</span> đến <span class="text-white font-bold">{{ paginationTextEnd }}</span> trên <span class="text-white font-bold">{{ filteredInventory.length }}</span> kết quả
       </div>
       <div class="flex items-center gap-1">
         <button 
@@ -455,7 +455,7 @@ function customCurrencyFormat(amount: number) {
 
 // Category styling metadata
 const getCategoryLabel = (cat: string) => {
-  return cat || 'Other';
+  return cat || 'Không rõ';
 };
 
 const getCategoryIcon = (cat: string) => {
@@ -500,9 +500,9 @@ const getStockStatus = (qty: number) => {
 
 const getStockStatusLabel = (qty: number) => {
   const status = getStockStatus(qty);
-  if (status === 'high') return 'High';
-  if (status === 'normal') return 'Normal';
-  return 'Low Stock';
+  if (status === 'high') return 'Nhiều';
+  if (status === 'normal') return 'Vừa';
+  return 'Sắp hết';
 };
 
 const getStockStatusColor = (qty: number) => {

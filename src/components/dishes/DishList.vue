@@ -14,7 +14,7 @@
             @input="handleSearch"
             type="text" 
             class="w-full bg-[#132210] border border-[#2A362C] text-[#A1B99D] text-sm rounded-lg focus:ring-[#37EC13] focus:border-[#37EC13] block pl-10 p-2.5 placeholder-gray-500 transition-colors" 
-            placeholder="Search dishes..."
+            placeholder="Tìm kiếm món ăn..."
           >
         </div>
         
@@ -22,7 +22,7 @@
         <div class="relative">
           <button @click="toggleFilter" @blur="closeFilterDelay" :aria-expanded="showFilterMenu" class="flex items-center gap-2 px-4 py-2.5 bg-[#132210] border border-[#2A362C] rounded-lg text-sm font-medium hover:bg-[#232F26] transition-colors whitespace-nowrap">
             <Filter class="w-4 h-4" />
-            <span class="hidden sm:inline">{{ selectedCategory === 'All' ? 'Filter' : selectedCategory }}</span>
+            <span class="hidden sm:inline">{{ selectedCategory === 'All' ? 'Bộ lọc' : selectedCategory }}</span>
           </button>
           
           <transition name="fade">
@@ -44,7 +44,7 @@
         <div class="relative">
           <button @click="toggleSortMenu" @blur="closeSortMenu" :aria-expanded="showSortMenu" class="flex items-center gap-2 px-4 py-2.5 bg-[#132210] border border-[#2A362C] rounded-lg text-sm font-medium hover:bg-[#232F26] transition-colors whitespace-nowrap">
             <ArrowUpDown class="w-4 h-4" />
-            <span class="hidden sm:inline">Sort: {{ sortField === 'name' ? 'Name' : 'Price' }}</span>
+            <span class="hidden sm:inline">Sắp xếp: {{ sortField === 'name' ? 'Tên' : 'Giá' }}</span>
             <span class="ml-1 text-xs" :class="sortOrder === 'asc' ? 'text-[#37EC13]' : 'text-orange-400'">
               ({{ sortOrder === 'asc' ? '↑' : '↓' }})
             </span>
@@ -58,11 +58,11 @@
                 class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-[#2A362C] hover:text-white transition-colors flex items-center justify-between"
               >
                 <span class="flex items-center gap-2">
-                  <span>Name</span>
+                  <span>Tên món ăn</span>
                 </span>
                 <div class="flex items-center gap-1">
                   <span v-if="sortField === 'name'" class="text-[#37EC13] text-xs">
-                    {{ sortOrder === 'asc' ? '↑ Ascending' : '↓ Descending' }}
+                    {{ sortOrder === 'asc' ? '↑ Tăng dần' : '↓ Giảm dần' }}
                   </span>
                   <Check v-if="sortField === 'name'" class="w-4 h-4 text-[#37EC13]" />
                 </div>
@@ -74,11 +74,11 @@
                 class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-[#2A362C] hover:text-white transition-colors flex items-center justify-between"
               >
                 <span class="flex items-center gap-2">
-                  <span>Price</span>
+                  <span>Giá bán</span>
                 </span>
                 <div class="flex items-center gap-1">
                   <span v-if="sortField === 'selling_price'" class="text-[#37EC13] text-xs">
-                    {{ sortOrder === 'asc' ? '↑ Ascending' : '↓ Descending' }}
+                    {{ sortOrder === 'asc' ? '↑ Tăng dần' : '↓ Giảm dần' }}
                   </span>
                   <Check v-if="sortField === 'selling_price'" class="w-4 h-4 text-[#37EC13]" />
                 </div>
@@ -92,9 +92,9 @@
                 @click="toggleSortOrder"
                 class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-[#2A362C] hover:text-white transition-colors flex items-center justify-between"
               >
-                <span>Toggle Order</span>
+                <span>Đảo ngược</span>
                 <span class="text-xs" :class="sortOrder === 'asc' ? 'text-[#37EC13]' : 'text-orange-400'">
-                  {{ sortOrder === 'asc' ? '↑ Ascending' : '↓ Descending' }}
+                  {{ sortOrder === 'asc' ? '↑ Tăng dần' : '↓ Giảm dần' }}
                 </span>
               </button>
             </div>
@@ -105,11 +105,11 @@
 
     <!-- Table Header -->
     <div class="hidden md:grid grid-cols-[2.5fr_1.5fr_1.5fr_1.5fr_80px] gap-4 px-6 py-4 border-b border-[#2A362C] bg-[#152512] text-xs font-bold text-gray-500 uppercase tracking-wider">
-      <div>Dish Name</div>
-      <div>Category</div>
-      <div>Selling Price</div>
-      <div>Recipe (Items)</div>
-      <div class="text-right pr-6">Actions</div>
+      <div>Tên món ăn</div>
+      <div>Danh mục</div>
+      <div>Giá bán</div>
+      <div>Công thức</div>
+      <div class="text-right pr-6">Thao tác</div>
     </div>
 
     <!-- Empty State -->
@@ -117,7 +117,7 @@
       <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#1B241D] mb-4">
         <UtensilsCrossed class="w-8 h-8 text-gray-500" />
       </div>
-      <p>No dishes found. Add a new recipe to your menu!</p>
+      <p>Không tìm thấy món ăn nào. Hãy thêm công thức mới vào thực đơn!</p>
     </div>
 
     <!-- Table Body -->
@@ -132,13 +132,13 @@
           </div>
           <div class="flex flex-col overflow-hidden">
             <span class="font-bold text-base text-gray-100 truncate w-full" :title="item.name">{{ item.name }}</span>
-            <span class="text-xs text-gray-500 mt-0.5">{{ item.description || 'No description' }}</span>
+            <span class="text-xs text-gray-500 mt-0.5">{{ item.description || 'Không có mô tả' }}</span>
           </div>
         </div>
 
         <!-- Category -->
         <div class="flex flex-col md:flex-row md:items-center mt-2 md:mt-0 gap-1.5 md:gap-0">
-          <span class="text-xs text-gray-500 md:hidden uppercase font-bold">Category:</span>
+          <span class="text-xs text-gray-500 md:hidden uppercase font-bold">Danh mục:</span>
           <div class="flex items-center gap-2 px-2.5 py-1.5 rounded-md w-fit" :class="getCategoryColor(item.category)">
             <component :is="getCategoryIcon(item.category)" class="w-4 h-4" />
             <span class="text-xs font-medium">{{ item.category }}</span>
@@ -147,7 +147,7 @@
 
         <!-- Selling Price -->
         <div class="flex flex-col md:flex-row md:items-center mt-2 md:mt-0 gap-1.5 md:gap-0">
-          <span class="text-xs text-gray-500 md:hidden uppercase font-bold">Price:</span>
+          <span class="text-xs text-gray-500 md:hidden uppercase font-bold">Giá:</span>
           <span class="font-medium text-[#37EC13]">
             {{ formatCurrency(item.selling_price) }}
           </span>
@@ -155,9 +155,9 @@
 
         <!-- Recipe Info -->
         <div class="flex flex-col md:flex-row md:items-center mt-2 md:mt-0 gap-1.5 md:gap-0">
-          <span class="text-xs text-gray-500 md:hidden uppercase font-bold">Recipe:</span>
+          <span class="text-xs text-gray-500 md:hidden uppercase font-bold">Công thức:</span>
           <div class="flex items-center gap-2">
-            <span class="text-sm text-gray-300">{{ item.ingredients.length }} Ingredients</span>
+            <span class="text-sm text-gray-300">{{ item.ingredients.length }} nguyên liệu</span>
           </div>
         </div>
 
@@ -170,11 +170,11 @@
             <transition name="fade">
               <div v-if="activeMenu === item.dish_code" class="absolute right-0 top-full mt-1 w-32 bg-[#1B241D] border border-[#2A362C] rounded-lg shadow-xl z-20 py-1 flex flex-col">
                 <button @click.stop="$emit('edit', item); activeMenu = null" class="flex items-center gap-2 w-full px-4 py-2 text-sm text-left text-gray-300 hover:bg-[#2A362C] hover:text-white transition-colors">
-                  <Pencil class="w-4 h-4" /> Edit
+                  <Pencil class="w-4 h-4" /> Sửa
                 </button>
                 <div class="h-px bg-[#2A362C] my-1 w-full"></div>
                 <button @click.stop="$emit('delete', item.dish_code); activeMenu = null" class="flex items-center gap-2 w-full px-4 py-2 text-sm text-left text-red-400 hover:bg-[#2A362C] hover:text-red-300 transition-colors">
-                  <Trash2 class="w-4 h-4" /> Delete
+                  <Trash2 class="w-4 h-4" /> Xóa
                 </button>
               </div>
             </transition>
@@ -187,7 +187,7 @@
     <!-- Pagination Footer -->
     <div v-if="filteredDishes.length > 0" class="p-4 sm:p-6 flex flex-col sm:flex-row justify-between items-center bg-[#132210] rounded-b-xl mt-auto">
       <div class="text-gray-400 text-sm mb-4 sm:mb-0 whitespace-nowrap">
-        Viewing <span class="text-white font-bold">{{ paginationTextStart }}</span> to <span class="text-white font-bold">{{ paginationTextEnd }}</span> of <span class="text-white font-bold">{{ filteredDishes.length }}</span> results
+        Đang hiển thị <span class="text-white font-bold">{{ paginationTextStart }}</span> đến <span class="text-white font-bold">{{ paginationTextEnd }}</span> trên <span class="text-white font-bold">{{ filteredDishes.length }}</span> kết quả
       </div>
       <div class="flex items-center gap-1">
         <button 

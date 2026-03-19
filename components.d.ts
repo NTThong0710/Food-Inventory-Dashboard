@@ -23,6 +23,7 @@ declare module 'vue' {
     ChartLegendContent: typeof import('./src/components/ui/chart/ChartLegendContent.vue')['default']
     ChartStyle: typeof import('./src/components/ui/chart/ChartStyle.vue')['default']
     ChartTooltipContent: typeof import('./src/components/ui/chart/ChartTooltipContent.vue')['default']
+    CurrentVisitsPieChart: typeof import('./src/components/ui/chart/CurrentVisitsPieChart.vue')['default']
     DishForm: typeof import('./src/components/dishes/DishForm.vue')['default']
     DishList: typeof import('./src/components/dishes/DishList.vue')['default']
     IngredientForm: typeof import('./src/components/inventory/IngredientForm.vue')['default']
@@ -77,5 +78,6 @@ declare module 'vue' {
     TooltipProvider: typeof import('./src/components/ui/tooltip/TooltipProvider.vue')['default']
     TooltipTrigger: typeof import('./src/components/ui/tooltip/TooltipTrigger.vue')['default']
     TopNavbar: typeof import('./src/components/layout/TopNavbar.vue')['default']
+    WebsiteVisitsChart: typeof import('./src/components/ui/chart/WebsiteVisitsChart.vue')['default']
   }
 }

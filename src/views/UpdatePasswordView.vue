@@ -10,8 +10,8 @@
         <div class="inline-flex justify-center items-center w-16 h-16 rounded-full bg-[#1B241D] border border-[#2A362C] shadow-inner mb-4">
           <KeyRound class="w-8 h-8 text-[#37EC13]" />
         </div>
-        <h1 class="text-3xl font-black text-amber-50 tracking-wider">Update Password</h1>
-        <p class="text-gray-400 text-sm mt-2">Enter your new password below.</p>
+        <h1 class="text-3xl font-black text-amber-50 tracking-wider">Cập nhật mật khẩu</h1>
+        <p class="text-gray-400 text-sm mt-2">Nhập mật khẩu mới của bạn dưới đây.</p>
       </div>
 
       <!-- Form -->
@@ -25,7 +25,7 @@
 
         <div class="space-y-4">
           <div>
-            <label class="block text-xs font-bold text-gray-400 shadow-text uppercase tracking-wider mb-2">New Password</label>
+            <label class="block text-xs font-bold text-gray-400 shadow-text uppercase tracking-wider mb-2">Mật khẩu mới</label>
             <div class="relative">
               <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Lock class="h-5 w-5 text-gray-500" />
@@ -48,7 +48,7 @@
           class="w-full bg-[#37EC13] text-[#132210] font-bold py-3 px-4 rounded-lg hover:bg-green-500 focus:ring-4 focus:ring-green-500/30 transition-all flex items-center justify-center gap-2 group disabled:opacity-70 disabled:cursor-wait"
         >
           <Loader2 v-if="isSubmitting" class="w-5 h-5 animate-spin" />
-          <span v-else>Save New Password</span>
+          <span v-else>Lưu mật khẩu mới</span>
         </button>
 
       </form>
@@ -57,11 +57,11 @@
       <div v-else class="text-center space-y-6 relative z-10">
         <div class="p-4 bg-green-900/30 border border-green-900/50 rounded-lg flex flex-col items-center gap-3 text-green-200">
           <CheckCircle class="w-8 h-8 text-[#37EC13]" />
-          <p class="font-medium text-lg">Password Updated</p>
-          <p class="text-sm">Your password has been successfully updated.</p>
+          <p class="font-medium text-lg">Cập nhật thành công</p>
+          <p class="text-sm">Mật khẩu của bạn đã được cập nhật thành công.</p>
         </div>
         <router-link to="/dashboard" class="w-full block bg-[#37EC13] text-[#132210] font-bold py-3 px-4 rounded-lg hover:bg-green-500 focus:ring-4 focus:ring-green-500/30 transition-all justify-center mt-6">
-          Go to Dashboard
+          Đi đến Trang chủ
         </router-link>
       </div>
 
@@ -89,7 +89,7 @@ const handleUpdate = async () => {
     await authStore.updatePassword(password.value);
     isSuccess.value = true;
   } catch (error: any) {
-    errorMsg.value = error.message || 'Failed to update password. Your reset link may have expired.';
+    errorMsg.value = error.message || 'Cập nhật mật khẩu thất bại. Liên kết của bạn có thể đã hết hạn.';
     console.error('Password update error:', error);
   } finally {
     isSubmitting.value = false;

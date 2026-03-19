@@ -2,9 +2,9 @@
   <main class="w-full bg-[#1F291E] p-6 border border-gray-700 shadow-md">
     <div class="header flex flex-col mb-6">
       <header class="font-bold text-[20px] text-amber-50">
-        {{ itemToEdit ? 'Edit Ingredient' : 'Add New Ingredient' }}
+        {{ itemToEdit ? 'Chỉnh sửa nguyên liệu' : 'Thêm nguyên liệu mới' }}
       </header>
-      <p class="text-amber-50 mt-1">Enter the details below to update your pantry inventory</p>
+      <p class="text-amber-50 mt-1">Nhập thông tin chi tiết dưới đây để cập nhật kho nguyên liệu</p>
     </div>
 
     <!-- Thông báo lỗi nếu validation sai -->
@@ -18,63 +18,63 @@
       <form @submit.prevent="handleSubmit" class="text-white grid grid-cols-1 md:grid-cols-3 gap-6">
         
         <div class="flex flex-col">
-          <label for="ingredient-sku">SKU Code</label>
+          <label for="ingredient-sku">Mã vạch (SKU)</label>
           <input v-model="form.sku" type="text" id="ingredient-sku" placeholder="e.g. ING_001" required :disabled="!!itemToEdit"
             class="bg-[#121811] p-4 mt-2 border border-transparent hover:border-[#37EC13] focus:outline-none focus:border-[#37EC13] transition-colors disabled:opacity-50">
         </div>
 
         <div class="flex flex-col">
-          <label for="ingredient-name">Ingredient Name</label>
+          <label for="ingredient-name">Tên nguyên liệu</label>
           <!-- v-model: Tạo liên kết 2 chiều. Khi bạn gõ phím, form.name tự động cập nhật và ngược lại -->
-          <input v-model="form.name" type="text" id="ingredient-name" placeholder="e.g. Organic Avocado" required
+          <input v-model="form.name" type="text" id="ingredient-name" placeholder="VD: Bơ hữu cơ" required
             class="bg-[#121811] p-4 mt-2 border border-transparent hover:border-[#37EC13] focus:outline-none focus:border-[#37EC13] transition-colors">
         </div>
 
         <div class="flex flex-col md:col-span-1">
-          <label for="category">Category</label>
+          <label for="category">Danh mục</label>
           <select v-model="form.category_code" id="category" required
             class="bg-[#121811] p-4 mt-2 border border-transparent hover:border-[#37EC13] focus:outline-none focus:border-[#37EC13] transition-colors">
-            <option value="">Select a category</option>
+            <option value="">Chọn một danh mục</option>
             <option v-for="cat in inventoryStore.categories" :key="cat.category_code" :value="cat.category_code">{{ cat.name }}</option>
           </select>
         </div>
 
         <div class="flex flex-col">
-          <label for="production-date">Production Date</label>
+          <label for="production-date">Ngày sản xuất</label>
           <input v-model="form.production_date" type="date" id="production-date"
             class="bg-[#121811] p-4 mt-2 border border-transparent hover:border-[#37EC13] focus:outline-none focus:border-[#37EC13] transition-colors">
         </div>
 
         <div class="flex flex-col">
-          <label for="expired-date">Expiry Date</label>
+          <label for="expired-date">Ngày hết hạn</label>
           <input v-model="form.expiry_date" type="date" id="expired-date"
             class="bg-[#121811] p-4 mt-2 border border-transparent hover:border-[#37EC13] focus:outline-none focus:border-[#37EC13] transition-colors">
         </div>
 
         <div class="flex flex-col">
-          <label for="quantity">Stock Quantity</label>
+          <label for="quantity">Số lượng tồn kho</label>
           <input v-model.number="form.stock_quantity" type="number" inputmode="numeric" id="quantity" placeholder="0" required
             class="bg-[#121811] p-4 mt-2 border border-transparent hover:border-[#37EC13] focus:outline-none focus:border-[#37EC13] transition-colors">
         </div>
 
         <div class="flex flex-col">
-          <label for="unit">Unit of Measurement</label>
+          <label for="unit">Đơn vị đo lường</label>
           <select v-model="form.unit" id="unit" required
             class="bg-[#121811] p-4 mt-2 border border-transparent hover:border-[#37EC13] focus:outline-none focus:border-[#37EC13] transition-colors">
-            <option value="">Select unit</option>
-            <option value="g">Grams (g)</option>
-            <option value="kg">Kilograms (kg)</option>
-            <option value="ml">Milliliters (ml)</option>
-            <option value="l">Liters (l)</option>
-            <option value="oz">Ounces (oz)</option>
-            <option value="lb">Pounds (lb)</option>
-            <option value="p/c">Pieces/Count</option>
+            <option value="">Chọn đơn vị</option>
+            <option value="g">Gram (g)</option>
+            <option value="kg">Kilogram (kg)</option>
+            <option value="ml">Mililit (ml)</option>
+            <option value="l">Lít (l)</option>
+            <option value="oz">Ounce (oz)</option>
+            <option value="lb">Pound (lb)</option>
+            <option value="p/c">Cái/Hộp/Khay</option>
           </select>
         </div>
 
         <div class="flex flex-col">
-          <label for="cost">Unit Cost (VND)</label>
-          <input v-model.number="form.unit_cost" type="number" inputmode="numeric" id="cost" placeholder="0" required
+          <label for="cost">Đơn giá (VND)</label>
+          <input v-model="displayUnitCost" type="text" inputmode="numeric" id="cost" placeholder="0" required
             class="bg-[#121811] p-4 mt-2 border border-transparent hover:border-[#37EC13] focus:outline-none focus:border-[#37EC13] transition-colors">
         </div>
 
@@ -87,21 +87,21 @@
 
         <!-- Computed Property Display: Hiển thị giá trị tính toán tự động -->
         <div class="md:col-span-3 bg-[#121811] p-4 rounded border border-gray-700 font-bold text-lg flex justify-between">
-          <span>Estimated Total Cost:</span>
-          <span class="text-[#37EC13]">{{ estimatedTotal.toLocaleString() }} VND</span>
+          <span>Ước lượng tổng chi phí:</span>
+          <span class="text-[#37EC13]">{{ estimatedTotal.toLocaleString('vi-VN') }} VND</span>
         </div>
 
         <div class="md:col-span-3 border-t border-gray-600 pt-4 flex justify-end gap-3 mt-4">
           <button type="button" @click="handleCancel"
             class="px-6 py-3 bg-gray-700 text-white font-bold hover:bg-gray-600 rounded transition-colors">
-            Cancel
+            Hủy
           </button>
           
           <!-- Nút Save bị vô hiệu hóa (disabled) nếu form không hợp lệ (computed: isFormValid = false) -->
           <button type="submit" :disabled="!isFormValid"
             class="px-6 py-3 font-bold rounded transition-colors"
             :class="isFormValid ? 'bg-[#37EC13] text-black hover:bg-green-500' : 'bg-gray-600 text-gray-400 cursor-not-allowed'">
-            {{ itemToEdit ? 'Update Ingredient' : 'Save Ingredient' }}
+            {{ itemToEdit ? 'Cập nhật' : 'Lưu lại' }}
           </button>
         </div>
       </form>
@@ -130,6 +130,18 @@ const estimatedTotal = computed(() => {
     return form.stock_quantity * form.unit_cost;
 })
 
+const displayUnitCost = computed({
+  get() {
+    return form.unit_cost ? form.unit_cost.toLocaleString('vi-VN') : (form.unit_cost === 0 ? '0' : '');
+  },
+  set(val: string) {
+    // Loại bỏ mọi ký tự không phải số (bao gồm cả dấu chấm phân cách)
+    let cleaned = val.replace(/\D/g, '');
+    const num = Number(cleaned);
+    form.unit_cost = isNaN(num) ? 0 : num;
+  }
+})
+
 // 2. COMPUTED (Validation): Kiểm tra xem form có điền đủ thông tin quan trọng không
 const isFormValid = computed(() => {
     return form.sku.trim() !== '' && form.name.trim() !== '' && form.category_code !== '' && form.stock_quantity >= 0 && errorMessage.value === ''
@@ -143,17 +155,17 @@ const errorMessage = computed ( () => {
   
   const { stock_quantity, unit_cost, expiry_date, production_date } = form
 
-  if (stock_quantity < 0 || unit_cost < 0 ) return "Stock quantity and unit cost cannot be negative numbers"
+  if (stock_quantity < 0 || unit_cost < 0 ) return "Số lượng và giá trị không thể nhỏ hơn 0"
 
   if (stock_quantity === 0 && unit_cost > 0) {
-    return "Stock Quantity should be greater than 0!";
+    return "Số lượng phải lớn hơn 0!";
   }
 
   if (expiry_date && production_date) {
     const expired = new Date(expiry_date);
     const prod = new Date(production_date);
     if (expired <= prod) {
-      return "Please type Expired date greater than Production date!";
+      return "Ngày hết hạn phải lớn hơn ngày sản xuất!";
     }
   }
 

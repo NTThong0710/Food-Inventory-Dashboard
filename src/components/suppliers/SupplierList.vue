@@ -13,7 +13,7 @@
             v-model="searchQuery"
             type="text" 
             class="w-full bg-[#132210] border border-[#2A362C] text-[#A1B99D] text-sm rounded-lg focus:ring-[#37EC13] focus:border-[#37EC13] block pl-10 p-2.5 placeholder-gray-500 transition-colors" 
-            placeholder="Search suppliers..."
+            placeholder="Tìm kiếm nhà cung cấp..."
           >
         </div>
         
@@ -21,7 +21,7 @@
         <div class="relative">
           <button @click="toggleFilter" @blur="closeFilterDelay" class="flex items-center gap-2 px-4 py-2.5 bg-[#132210] border border-[#2A362C] rounded-lg text-sm font-medium hover:bg-[#232F26] transition-colors whitespace-nowrap">
             <Filter class="w-4 h-4" />
-            <span class="hidden sm:inline">{{ selectedStatus === 'All' ? 'Filter Status' : selectedStatus }}</span>
+            <span class="hidden sm:inline">{{ selectedStatus === 'All' ? 'Lọc trạng thái' : selectedStatus }}</span>
           </button>
           
           <transition name="fade">
@@ -40,20 +40,20 @@
         </div>
 
         <!-- Sort Button -->
-        <button @click="toggleSort('name')" class="flex items-center gap-2 px-4 py-2.5 bg-[#132210] border border-[#2A362C] rounded-lg text-sm font-medium hover:bg-[#232F26] transition-colors whitespace-nowrap" :title="sortField === 'name' ? `Sort ${sortOrder === 'asc' ? 'descending' : 'ascending'}` : 'Sort by name'">
+        <button @click="toggleSort('name')" class="flex items-center gap-2 px-4 py-2.5 bg-[#132210] border border-[#2A362C] rounded-lg text-sm font-medium hover:bg-[#232F26] transition-colors whitespace-nowrap" :title="sortField === 'name' ? `Sắp xếp ${sortOrder === 'asc' ? 'giảm dần' : 'tăng dần'}` : 'Sắp xếp theo tên'">
           <ArrowUpDown class="w-4 h-4" />
-          <span class="hidden sm:inline">Sort: {{ sortField }}</span>
+          <span class="hidden sm:inline">Sắp xếp: {{ sortField === 'name' ? 'Tên' : sortField }}</span>
         </button>
       </div>
     </div>
 
     <!-- Table Header -->
     <div class="hidden md:grid grid-cols-[2.5fr_1fr_1.5fr_1fr_80px] gap-4 px-6 py-4 border-b border-[#2A362C] bg-[#152512] text-xs font-bold text-gray-500 uppercase tracking-wider">
-      <div>Supplier Name</div>
-      <div>Contact</div>
-      <div>Email / Phone</div>
-      <div>Status</div>
-      <div class="text-right pr-6">Actions</div>
+      <div>Tên nhà cung cấp</div>
+      <div>Liên hệ</div>
+      <div>Email / ĐT</div>
+      <div>Trạng thái</div>
+      <div class="text-right pr-6">Thao tác</div>
     </div>
 
     <!-- Empty State -->
@@ -61,7 +61,7 @@
       <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#1B241D] mb-4">
         <Users class="w-8 h-8 text-gray-500" />
       </div>
-      <p>No suppliers found. Try adding a new supplier to your list!</p>
+      <p>Không tìm thấy nhà cung cấp nào. Hãy thử thêm nhà cung cấp mới!</p>
     </div>
 
     <!-- Table Body -->
@@ -76,13 +76,18 @@
           </div>
           <div class="flex flex-col overflow-hidden">
             <span class="font-bold text-base text-gray-100 truncate w-full" :title="item.name">{{ item.name }}</span>
-            <span class="text-xs text-gray-500 mt-0.5 truncate">{{ item.address }}</span>
+            <div class="flex items-center gap-2 mt-0.5">
+              <span class="text-xs text-gray-500 truncate">{{ item.address }}</span>
+              <span v-if="item.ingredients && item.ingredients.length > 0" class="text-[10px] px-1.5 py-0.5 bg-[#2A362C] text-gray-300 rounded whitespace-nowrap">
+                {{ item.ingredients.length }} SP
+              </span>
+            </div>
           </div>
         </div>
 
         <!-- Contact Person -->
         <div class="flex flex-col md:flex-row md:items-center mt-2 md:mt-0 gap-1.5 md:gap-0">
-          <span class="text-xs text-gray-500 md:hidden uppercase font-bold">Contact:</span>
+          <span class="text-xs text-gray-500 md:hidden uppercase font-bold">Liên hệ:</span>
           <span class="text-sm font-medium text-gray-300">
             {{ item.contact_name }}
           </span>
@@ -90,14 +95,14 @@
 
         <!-- Email & Phone -->
         <div class="flex flex-col mt-2 md:mt-0 gap-0.5">
-          <span class="text-xs text-gray-500 md:hidden uppercase font-bold mb-1">Contact Info:</span>
+          <span class="text-xs text-gray-500 md:hidden uppercase font-bold mb-1">Thông tin liên hệ:</span>
           <span class="font-medium text-[#37EC13] text-sm truncate" :title="item.email">{{ item.email }}</span>
           <span class="text-xs text-gray-400">{{ item.phone }}</span>
         </div>
 
         <!-- Status -->
         <div class="flex flex-col md:flex-row md:items-center mt-2 md:mt-0 gap-1.5 md:gap-0">
-          <span class="text-xs text-gray-500 md:hidden uppercase font-bold">Status:</span>
+          <span class="text-xs text-gray-500 md:hidden uppercase font-bold">Trạng thái:</span>
           <span class="px-2.5 py-1 text-xs font-medium rounded-md w-fit"
                 :class="item.status === 'Active' ? 'bg-[#1B5E20]/40 text-[#37EC13] border border-[#1B5E20]' : 'bg-red-900/30 text-red-400 border border-red-900/50'">
             {{ item.status }}
@@ -113,11 +118,11 @@
             <transition name="fade">
               <div v-if="activeMenu === item.supplier_code" class="absolute right-0 top-full mt-1 w-32 bg-[#1B241D] border border-[#2A362C] rounded-lg shadow-xl z-20 py-1 flex flex-col">
                 <button @click.stop="$emit('edit', item); activeMenu = null" class="flex items-center gap-2 w-full px-4 py-2 text-sm text-left text-gray-300 hover:bg-[#2A362C] hover:text-white transition-colors">
-                  <Pencil class="w-4 h-4" /> Edit
+                  <Pencil class="w-4 h-4" /> Sửa
                 </button>
                 <div class="h-px bg-[#2A362C] my-1 w-full"></div>
                 <button @click.stop="$emit('delete', item.supplier_code); activeMenu = null" class="flex items-center gap-2 w-full px-4 py-2 text-sm text-left text-red-400 hover:bg-[#2A362C] hover:text-red-300 transition-colors">
-                  <Trash2 class="w-4 h-4" /> Delete
+                  <Trash2 class="w-4 h-4" /> Xóa
                 </button>
               </div>
             </transition>
@@ -130,7 +135,7 @@
     <!-- Pagination Footer -->
     <div v-if="filteredSuppliers.length > 0" class="p-4 sm:p-6 flex flex-col sm:flex-row justify-between items-center bg-[#132210] rounded-b-xl mt-auto">
       <div class="text-gray-400 text-sm mb-4 sm:mb-0 whitespace-nowrap">
-        Viewing <span class="text-white font-bold">{{ paginationTextStart }}</span> to <span class="text-white font-bold">{{ paginationTextEnd }}</span> of <span class="text-white font-bold">{{ filteredSuppliers.length }}</span> results
+        Đang hiển thị <span class="text-white font-bold">{{ paginationTextStart }}</span> đến <span class="text-white font-bold">{{ paginationTextEnd }}</span> trên <span class="text-white font-bold">{{ filteredSuppliers.length }}</span> kết quả
       </div>
       <div class="flex items-center gap-1">
         <button 

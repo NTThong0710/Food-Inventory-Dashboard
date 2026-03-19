@@ -11,7 +11,7 @@
           <Utensils class="w-8 h-8 text-[#37EC13]" aria-hidden="true" />
         </div>
         <h1 class="text-3xl font-black text-amber-50 uppercase tracking-wider">Kitchen<span class="text-[#37EC13]">Ops</span></h1>
-        <p class="text-gray-400 text-sm mt-2">Sign in to manage your unified culinary workspace.</p>
+        <p class="text-gray-400 text-sm mt-2">Đăng nhập để quản lý không gian làm việc ẩm thực thống nhất của bạn.</p>
       </div>
 
       <!-- Form -->
@@ -25,7 +25,7 @@
 
         <div class="space-y-4">
           <div>
-            <label for="login-email" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Email Address</label>
+            <label for="login-email" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Địa chỉ Email</label>
             <div class="relative">
               <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Mail class="h-5 w-5 text-gray-500" aria-hidden="true" />
@@ -46,8 +46,8 @@
 
           <div>
             <div class="flex items-center justify-between mb-2">
-              <label for="login-password" class="block text-xs font-bold text-gray-400 uppercase tracking-wider">Password</label>
-              <router-link to="/forgot-password" class="text-xs text-[#37EC13] hover:underline">Forgot Password?</router-link>
+              <label for="login-password" class="block text-xs font-bold text-gray-400 uppercase tracking-wider">Mật khẩu</label>
+              <router-link to="/forgot-password" class="text-xs text-[#37EC13] hover:underline">Quên mật khẩu?</router-link>
             </div>
             <div class="relative">
               <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -73,7 +73,7 @@
           class="w-full bg-[#37EC13] text-[#132210] font-bold py-3 px-4 rounded-lg hover:bg-green-500 focus:ring-4 focus:ring-green-500/30 transition-colors flex items-center justify-center gap-2 group disabled:opacity-70 disabled:cursor-wait"
         >
           <Loader2 v-if="isSubmitting" class="w-5 h-5 animate-spin" aria-hidden="true" />
-          <span v-else>Authorize Access</span>
+          <span v-else>Đăng nhập</span>
           <ArrowRight v-if="!isSubmitting" class="w-5 h-5 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
         </button>
       </form>
@@ -111,7 +111,7 @@ const handleLogin = async () => {
     router.push('/');
     
   } catch (error: any) {
-    errorMsg.value = error.message || 'Failed to authenticate.';
+    errorMsg.value = error.message || 'Xác thực thất bại.';
     console.error('Login error:', error);
   } finally {
     isSubmitting.value = false;

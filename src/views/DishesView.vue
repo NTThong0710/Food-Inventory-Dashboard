@@ -12,10 +12,10 @@
             </div>
             <div class="flex flex-col gap-2">
               <ProgressBar :value="progress" :showValue="false" :style="{ height: '4px' }" pt:value:class="!bg-primary-50 dark:!bg-primary-900" class="bg-primary/80!"></ProgressBar>
-              <label class="text-sm font-bold text-white dark:text-black">{{ progress }}% downloaded</label>
+              <label class="text-sm font-bold text-white dark:text-black">{{ progress }}% đã tải xuống</label>
             </div>
             <div class="flex gap-4 mb-4 justify-end">
-              <Button label="Cancel" size="small" @click="closeCallback"></Button>
+              <Button label="Hủy" size="small" @click="closeCallback"></Button>
             </div>
           </section>
         </template>
@@ -25,8 +25,8 @@
     <!-- Header -->
     <div class="flex justify-between items-center">
       <div>
-        <h2 class="text-3xl font-bold text-white tracking-tight">Dishes Menu</h2>
-        <p class="text-gray-400 text-sm mt-1">Manage your recipes and selling prices across the menu.</p>
+        <h2 class="text-3xl font-bold text-white tracking-tight">Thực đơn món ăn</h2>
+        <p class="text-gray-400 text-sm mt-1">Quản lý công thức và giá bán trên toàn bộ thực đơn.</p>
       </div>
 
       <div class="flex gap-2">
@@ -35,12 +35,12 @@
           class="bg-green-500 text-black px-4 py-2 rounded font-bold hover:bg-[#37EC13] transition-colors flex items-center gap-2"
         >
           <Download class="w-4 h-4" aria-hidden="true" />
-          Export Excel
+          Xuất Excel
         </button>
 
         <button @click="openNewForm" class="bg-[#37EC13] hover:bg-[#45F522] text-[#132210] px-4 py-2 font-bold rounded-lg flex items-center justify-center gap-2 transition-colors shadow-[0_0_15px_rgba(55,236,19,0.3)]">
           <Plus class="w-5 h-5"/>
-          New Dish
+          Thêm món ăn
         </button>
       </div>
     </div>
@@ -121,6 +121,14 @@ const closeForm = () => {
 };
 
 const handleSave = async (itemData: Dish) => {
+  if (!editingItem.value) {
+    const isDuplicate = store.items.some(item => item.dish_code.toLowerCase() === itemData.dish_code.toLowerCase());
+    if (isDuplicate) {
+      toast.add({ severity: 'error', summary: 'Lỗi', detail: 'Mã món ăn đã tồn tại', life: 3000 });
+      return;
+    }
+  }
+
   if (editingItem.value) {
     await store.updateDish(itemData);
   } else {
@@ -132,7 +140,7 @@ const handleSave = async (itemData: Dish) => {
 };
 
 const handleDelete = async (dishCode: string) => {
-  if (confirm('Are you sure you want to delete this dish and its recipes?')) {
+  if (confirm('Bạn có chắc chắn muốn xóa món ăn này và công thức của nó không?')) {
     await store.deleteDish(dishCode);
     await store.fetchDishes();
     if (editingItem.value?.dish_code === dishCode) {
@@ -143,7 +151,7 @@ const handleDelete = async (dishCode: string) => {
 
 const downloadExcel = async () => {
   if (!visible.value) {
-    toast.add({ severity: 'custom', summary: 'Generating Excel file...', group: 'headless', styleClass: 'backdrop-blur-lg rounded-2xl' });
+    toast.add({ severity: 'custom', summary: 'Đang tạo file Excel...', group: 'headless', styleClass: 'backdrop-blur-lg rounded-2xl' });
     visible.value = true;
   }
   progress.value = 0;
@@ -159,16 +167,16 @@ const downloadExcel = async () => {
 
     const sortedItems = [...store.items].sort((a, b) => a.dish_code.localeCompare(b.dish_code));
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('Dishes Report');
+    const worksheet = workbook.addWorksheet('Báo cáo món ăn');
 
     worksheet.columns = [
-      { header: 'Dish Code', key: 'dish_code', width: 15 },
-      { header: 'Dish Name', key: 'name', width: 30 },
-      { header: 'Category', key: 'category', width: 20 },
-      { header: 'Selling Price (VND)', key: 'selling_price', width: 20 },
-      { header: 'Prep Time (min)', key: 'prep_time', width: 15 },
-      { header: 'Servings', key: 'servings', width: 10 },
-      { header: 'Labor Cost (VND)', key: 'labor_cost', width: 20 },
+      { header: 'Mã món ăn', key: 'dish_code', width: 15 },
+      { header: 'Tên món ăn', key: 'name', width: 30 },
+      { header: 'Danh mục', key: 'category', width: 20 },
+      { header: 'Giá bán (VND)', key: 'selling_price', width: 20 },
+      { header: 'Thời gian cb.bị (phút)', key: 'prep_time', width: 15 },
+      { header: 'Khẩu phần', key: 'servings', width: 10 },
+      { header: 'Chi phí nhân công (VND)', key: 'labor_cost', width: 20 },
     ];
 
     const headerRow = worksheet.getRow(1);

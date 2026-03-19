@@ -11,27 +11,27 @@
 
       <!-- Cột trái: Dish Details -->
       <div class="bg-[#131A14] border border-[#2A362C] p-6 shadow-md flex flex-col h-fit">
-        <h3 class="font-bold text-white text-lg mb-4">Dish Details</h3>
+        <h3 class="font-bold text-white text-lg mb-4">Chi tiết món ăn</h3>
         
         <div class="space-y-4">
           <!-- Dish Code -->
           <div>
-            <label class="block text-sm font-bold text-gray-300 mb-1.5">Dish Code</label>
-            <input v-model="formData.dish_code" :disabled="isEditing" required placeholder="e.g., DISH_001" class="w-full bg-[#1B241D] border border-transparent rounded-lg px-4 py-2.5 text-white focus:ring-1 focus:ring-[#37EC13] transition-colors outline-none disabled:opacity-50" />
+            <label class="block text-sm font-bold text-gray-300 mb-1.5">Mã món ăn</label>
+            <input v-model="formData.dish_code" :disabled="isEditing" required placeholder="VD: MON_001" class="w-full bg-[#1B241D] border border-transparent rounded-lg px-4 py-2.5 text-white focus:ring-1 focus:ring-[#37EC13] transition-colors outline-none disabled:opacity-50" />
           </div>
 
           <!-- Dish Name -->
           <div>
-            <label class="block text-sm font-bold text-gray-300 mb-1.5">Dish Name</label>
-            <input v-model="formData.name" placeholder="e.g., Spicy Tuna Roll" class="w-full bg-[#1B241D] border border-transparent rounded-lg px-4 py-2.5 text-white focus:ring-1 focus:ring-[#37EC13] transition-colors outline-none" />
+            <label class="block text-sm font-bold text-gray-300 mb-1.5">Tên món ăn</label>
+            <input v-model="formData.name" placeholder="VD: Bò bít tết" class="w-full bg-[#1B241D] border border-transparent rounded-lg px-4 py-2.5 text-white focus:ring-1 focus:ring-[#37EC13] transition-colors outline-none" />
           </div>
 
           <!-- Category -->
           <div>
-            <label class="block text-sm font-bold text-gray-300 mb-1.5">Category</label>
+            <label class="block text-sm font-bold text-gray-300 mb-1.5">Danh mục</label>
             <div class="relative">
               <select v-model="formData.category_code" class="w-full bg-[#1B241D] border border-transparent rounded-lg pl-4 pr-10 py-2.5 text-white focus:ring-1 focus:ring-[#37EC13] transition-colors outline-none appearance-none cursor-pointer">
-                <option value="" disabled>Select category</option>
+                <option value="" disabled>Chọn danh mục</option>
                 <option v-for="cat in dishesStore.categories" :key="cat.category_code" :value="cat.category_code">{{ cat.name }}</option>
               </select>
               <ChevronDown class="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -41,19 +41,19 @@
           <!-- Prep Time và Servings -->
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-bold text-gray-300 mb-1.5">Prep Time (min)</label>
+              <label class="block text-sm font-bold text-gray-300 mb-1.5">Thời gian ch.bị (phút)</label>
               <input v-model.number="formData.prep_time" type="number" inputmode="numeric" min="0" class="w-full bg-[#1B241D] rounded-lg px-4 py-2.5 text-white focus:ring-1 focus:ring-[#37EC13] outline-none border border-transparent" />
             </div>
             <div>
-              <label class="block text-sm font-bold text-gray-300 mb-1.5">Servings (optional)</label>
+              <label class="block text-sm font-bold text-gray-300 mb-1.5">Khẩu phần</label>
               <input v-model.number="formData.servings" type="number" inputmode="numeric" min="1" class="w-full bg-[#1B241D] rounded-lg px-4 py-2.5 text-white focus:ring-1 focus:ring-[#37EC13] outline-none border border-transparent" />
             </div>
           </div>
 
           <!-- Description -->
           <div>
-            <label class="block text-sm font-bold text-gray-300 mb-1.5">Description / Preparation</label>
-            <textarea v-model="formData.description" rows="4" class="w-full bg-[#1B241D] rounded-lg px-4 py-2.5 text-white focus:ring-1 focus:ring-[#37EC13] outline-none border border-transparent resize-y" placeholder="Describe the dish and how it is prepared..."></textarea>
+            <label class="block text-sm font-bold text-gray-300 mb-1.5">Mô tả / Cách làm</label>
+            <textarea v-model="formData.description" rows="4" class="w-full bg-[#1B241D] rounded-lg px-4 py-2.5 text-white focus:ring-1 focus:ring-[#37EC13] outline-none border border-transparent resize-y" placeholder="Mô tả món ăn và cách làm..."></textarea>
           </div>
 
           <!-- Image Upload -->
@@ -79,25 +79,25 @@
         <!-- Ingredients & Costing List -->
         <div class="bg-[#131A14] border border-[#2A362C] rounded-xl p-6 shadow-md">
           <div class="flex justify-between items-center mb-4">
-            <h3 class="font-bold text-white text-lg">Ingredients & Costing</h3>
+            <h3 class="font-bold text-white text-lg">Nguyên liệu & Chi phí</h3>
             <button @click="addIngredientRow" class="text-sm font-bold text-[#37EC13] hover:text-[#45F522] flex items-center gap-1 transition-colors">
-              <Plus class="w-4 h-4"/> Add Ingredient
+              <Plus class="w-4 h-4"/> Thêm nguyên liệu
             </button>
           </div>
 
           <!-- Ingredient Table Header -->
           <div class="grid grid-cols-[minmax(120px,2fr)_minmax(60px,1fr)_1fr_1fr_40px] gap-3 text-[10px] font-bold text-gray-500 py-2 border-b border-[#2A362C] uppercase tracking-wider items-center">
-            <div class="pl-2">Ingredient</div>
-            <div>Quantity</div>
-            <div>Unit</div>
-            <div>Cost</div>
+            <div class="pl-2">Nguyên liệu</div>
+            <div>Số lượng</div>
+            <div>Đơn vị</div>
+            <div>Giá</div>
             <div></div> <!-- Delete col -->
           </div>
 
           <!-- Rows -->
           <div class="flex flex-col gap-2 mt-3">
             <div v-if="formData.ingredients.length === 0" class="text-center py-6 text-gray-500 text-sm">
-              No ingredients added. Build your recipe!
+              Chưa có nguyên liệu nào.
             </div>
             
             <div v-for="(ing, idx) in formData.ingredients" :key="idx" class="grid grid-cols-[minmax(120px,2fr)_minmax(60px,1fr)_1fr_1fr_40px] gap-3 items-center group">
@@ -105,7 +105,7 @@
               <!-- Ingredient Select -->
               <div class="relative">
                 <select v-model="ing.ingredient_sku" class="w-full bg-[#1B241D] border border-transparent rounded-lg pl-3 md:pl-8 pr-3 py-2 text-sm text-white focus:ring-1 focus:ring-[#37EC13] outline-none appearance-none cursor-pointer">
-                  <option value="" disabled>Select...</option>
+                  <option value="" disabled>Chọn...</option>
                   <option v-for="inv in inventoryStore.items" :key="inv.sku" :value="inv.sku">{{ inv.name }}</option>
                 </select>
               <!-- Dynamic image icon -->
@@ -140,7 +140,7 @@
         <div class="mt-4 pt-4 border-t border-[#2A362C] relative">
           <div class="flex items-center gap-3 bg-[#1B241D] rounded-lg px-3 py-2 border border-transparent focus-within:border-[#37EC13] transition-colors">
             <Search class="w-4 h-4 text-[#37EC13]" />
-            <input v-model="ingredientSearchQuery" @focus="showIngredientSearch = true" @blur="closeIngredientSearch" type="text" placeholder="Search ingredient to add..." class="bg-transparent text-sm text-white font-medium placeholder:text-gray-500 outline-none w-full flex-1">
+            <input v-model="ingredientSearchQuery" @focus="showIngredientSearch = true" @blur="closeIngredientSearch" type="text" placeholder="Tìm kiếm nguyên liệu để thêm..." class="bg-transparent text-sm text-white font-medium placeholder:text-gray-500 outline-none w-full flex-1">
           </div>
           
           <transition name="fade">
@@ -153,7 +153,7 @@
                    <span class="text-xs text-gray-500 ml-auto">{{ formatCurrency(inv.cost) }} / {{ inv.unit }}</span>
                </button>
                <div v-if="filteredSearchIngredients.length === 0" class="px-4 py-3 text-sm text-gray-500 text-center">
-                  No matching ingredients found.
+                  Không tìm thấy nguyên liệu phù hợp.
                </div>
             </div>
           </transition>
@@ -166,15 +166,15 @@
           
           <!-- Cost Breakdown Panel -->
           <div class="bg-[#131A14] border border-[#2A362C] rounded-xl p-6 flex flex-col justify-between shadow-md">
-            <h3 class="font-bold text-white text-lg mb-5">Cost Breakdown</h3>
+            <h3 class="font-bold text-white text-lg mb-5">Phân tích chi phí</h3>
             <div class="space-y-4 text-sm font-medium flex-1">
               <div class="flex justify-between text-gray-400 items-center">
-                <span>Ingredient Cost</span>
+                <span>Chi phí nguyên liệu</span>
                 <span class="text-white">{{ formatCurrency(ingredientCost) }}</span>
               </div>
               
               <div class="flex justify-between items-center group">
-                <span class="text-gray-400">Overhead (%)</span>
+                <span class="text-gray-400">Hao hụt (%)</span>
                 <div class="flex items-center gap-1">
                   <input v-model.number="formData.overhead_percent" type="number" inputmode="numeric" min="0" class="w-14 bg-[#1B241D] border border-transparent rounded-md px-2 py-1 text-white text-right focus:ring-1 focus:ring-[#37EC13] outline-none">
                   <span class="text-gray-500 w-16 text-right">{{ formatCurrency(overheadCost) }}</span>
@@ -182,16 +182,16 @@
               </div>
 
               <div class="flex justify-between items-center group">
-                <span class="text-gray-400">Labor Estimate</span>
+                <span class="text-gray-400">Ước tính nhân công</span>
                 <div class="flex items-center gap-1">
                   <span class="text-gray-500">₫</span>
-                  <input v-model.number="formData.labor_cost" type="number" inputmode="decimal" step="any" min="0" class="w-16 bg-[#1B241D] border border-transparent rounded-md px-2 py-1 text-white text-right focus:ring-1 focus:ring-[#37EC13] outline-none">
+                  <input v-model="displayLaborCost" type="text" inputmode="numeric" class="w-20 bg-[#1B241D] border border-transparent rounded-md px-2 py-1 text-white text-right focus:ring-1 focus:ring-[#37EC13] outline-none">
                 </div>
               </div>
             </div>
 
             <div class="mt-5 pt-4 border-t border-[#2A362C] flex justify-between items-center">
-              <span class="font-bold text-white text-base">Total Cost</span>
+              <span class="font-bold text-white text-base">Tổng chi phí</span>
               <span class="font-bold text-[#37EC13] text-2xl tracking-tight">{{ formatCurrency(totalCost) }}</span>
             </div>
           </div>
@@ -201,12 +201,12 @@
             <!-- Decorative Glow -->
             <div class="absolute -right-10 -top-10 w-32 h-32 bg-[#37EC13] opacity-10 blur-[50px] pointer-events-none"></div>
 
-            <h3 class="font-bold text-white text-lg mb-4 relative z-10">Pricing Strategy</h3>
+            <h3 class="font-bold text-white text-lg mb-4 relative z-10">Chiến lược giá</h3>
             
             <div class="grid grid-cols-2 gap-4 mb-2 relative z-10">
               <!-- Target Food Cost -->
               <div>
-                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">Target Food Cost %</label>
+                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">% Chi phí thực phẩm</label>
                 <div class="flex items-center bg-[#1B241D] rounded-lg pr-3 border border-transparent focus-within:border-[#2A362C] transition-colors">
                   <input v-model.number="formData.target_margin" @input="calculatePriceFromTarget" type="number" min="1" max="100" class="w-full bg-transparent rounded-lg px-4 py-3 text-white font-bold text-lg outline-none">
                   <span class="text-gray-400 font-bold">%</span>
@@ -215,10 +215,10 @@
 
               <!-- Selling Price -->
               <div>
-                <label class="block text-[10px] font-bold text-[#37EC13] uppercase tracking-wider mb-2">Selling Price</label>
+                <label class="block text-[10px] font-bold text-[#37EC13] uppercase tracking-wider mb-2">Giá bán</label>
                 <div class="flex items-center bg-transparent border-2 border-[#37EC13] rounded-lg shadow-[0_0_15px_rgba(55,236,19,0.15)] px-3 py-2.5">
                   <span class="text-[#37EC13] font-bold opacity-80">₫</span>
-                  <input v-model.number="formData.selling_price" type="number" inputmode="decimal" step="any" min="0" class="w-full bg-transparent text-white font-bold text-xl text-right outline-none">
+                  <input v-model="displaySellingPrice" type="text" inputmode="numeric" class="w-full bg-transparent text-white font-bold text-xl text-right outline-none">
                 </div>
               </div>
             </div>
@@ -226,13 +226,13 @@
             <!-- Profit Stats -->
             <div class="mt-auto grid grid-cols-2 divide-x divide-[#2A362C] pt-4 relative z-10">
               <div class="flex flex-col pr-4">
-                <span class="text-[10px] text-gray-400 mb-1">Profit per serving</span>
+                <span class="text-[10px] text-gray-400 mb-1">Lợi nhuận mỗi phần</span>
                 <span :class="['font-bold text-lg', profitPerServing >= 0 ? 'text-[#37EC13]' : 'text-red-400']">
                   {{ profitPerServing > 0 ? '+' : '' }}{{ formatCurrency(profitPerServing) }}
                 </span>
               </div>
               <div class="flex flex-col text-right pl-4">
-                <span class="text-[10px] text-gray-400 mb-1">Margin</span>
+                <span class="text-[10px] text-gray-400 mb-1">Biên lợi nhuận</span>
                 <span class="font-bold text-white text-lg">{{ profitMarginPercent }}%</span>
               </div>
             </div>
@@ -245,10 +245,10 @@
     <!-- Bottom Actions -->
     <div class="mt-8 pt-6 border-t border-[#2A362C] flex justify-end gap-4">
       <button @click="$emit('cancel-edit')" type="button" class="px-6 py-3 rounded-lg font-bold text-white bg-[#1B241D] border border-[#2A362C] hover:bg-[#2A362C] transition-colors focus:ring-2 focus:ring-gray-500 outline-none">
-        Cancel
+        Hủy
       </button>
       <button @click="handleSubmit" type="button" class="px-6 py-3 rounded-lg font-bold bg-[#37EC13] text-[#131A14] hover:bg-[#45F522] transition-colors shadow-[0_0_15px_rgba(55,236,19,0.3)] focus:ring-2 focus:ring-[#37EC13] outline-none">
-        {{ isEditing ? 'Update Dish' : 'Save Dish' }}
+        {{ isEditing ? 'Cập nhật món' : 'Lưu món ăn' }}
       </button>
     </div>
   </div>
@@ -283,6 +283,28 @@ const formData = ref<Dish>({
   servings: 1,
   labor_cost: 0,
   overhead_percent: 10
+});
+
+const displaySellingPrice = computed({
+  get() {
+    return formData.value.selling_price ? formData.value.selling_price.toLocaleString('vi-VN') : (formData.value.selling_price === 0 ? '0' : '');
+  },
+  set(val: string) {
+    let cleaned = val.replace(/\D/g, '');
+    const num = Number(cleaned);
+    formData.value.selling_price = isNaN(num) ? 0 : num;
+  }
+});
+
+const displayLaborCost = computed({
+  get() {
+    return formData.value.labor_cost ? formData.value.labor_cost.toLocaleString('vi-VN') : (formData.value.labor_cost === 0 ? '0' : '');
+  },
+  set(val: string) {
+    let cleaned = val.replace(/\D/g, '');
+    const num = Number(cleaned);
+    formData.value.labor_cost = isNaN(num) ? 0 : num;
+  }
 });
 
 watch(() => props.itemToEdit, (newVal) => {

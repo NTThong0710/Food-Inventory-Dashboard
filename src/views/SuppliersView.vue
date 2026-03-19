@@ -4,12 +4,12 @@
     <!-- Header -->
     <div class="flex justify-between items-center">
       <div>
-        <h2 class="text-3xl font-bold text-white tracking-tight">Suppliers</h2>
-        <p class="text-gray-400 text-sm mt-1">Manage your vendors and order contacts.</p>
+        <h2 class="text-3xl font-bold text-white tracking-tight">Nhà cung cấp</h2>
+        <p class="text-gray-400 text-sm mt-1">Quản lý đối tác và thông tin liên hệ đặt hàng.</p>
       </div>
       <button @click="openNewForm" class="bg-[#37EC13] hover:bg-[#45F522] text-[#132210] px-4 py-2 font-bold rounded-lg flex items-center justify-center gap-2 transition-colors shadow-[0_0_15px_rgba(55,236,19,0.3)]">
         <Plus class="w-5 h-5"/>
-        New Supplier
+        Thêm nhà cung cấp
       </button>
     </div>
 
@@ -48,6 +48,7 @@ import SupplierList from '@/components/suppliers/SupplierList.vue';
 import { useSuppliersStore, type Supplier } from '@/stores/suppliers';
 import { Plus } from 'lucide-vue-next';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
+import { useToast } from "primevue/usetoast";
 
 // Use the Pinia Store
 const store = useSuppliersStore();
@@ -77,7 +78,17 @@ const closeForm = () => {
   isFormOpen.value = false;
 };
 
+const toast = useToast();
+
 const handleSave = async (itemData: Supplier) => {
+  if (!editingItem.value) {
+    const isDuplicate = store.items.some(item => item.supplier_code.toLowerCase() === itemData.supplier_code.toLowerCase());
+    if (isDuplicate) {
+      toast.add({ severity: 'error', summary: 'Lỗi', detail: 'Mã nhà cung cấp đã tồn tại', life: 3000 });
+      return;
+    }
+  }
+
   if (editingItem.value) {
     await store.updateSupplier(itemData);
   } else {
@@ -88,7 +99,7 @@ const handleSave = async (itemData: Supplier) => {
 };
 
 const handleDelete = async (supplierCode: string) => {
-  if (confirm('Are you sure you want to remove this supplier?')) {
+  if (confirm('Bạn có chắc chắn muốn xóa nhà cung cấp này không?')) {
     await store.deleteSupplier(supplierCode);
     await store.fetchSuppliers();
     if (editingItem.value?.supplier_code === supplierCode) {
