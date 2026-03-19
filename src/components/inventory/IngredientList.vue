@@ -133,7 +133,7 @@
       <div class="flex justify-center">Tồn kho</div>
       <div class="flex justify-center">Ngày SX</div>
       <div>Hạn sử dụng</div>
-      <div class="flex justify-center">Thao tác</div>
+      <div class="flex justify-center"></div>
     </div>
 
     <!-- Empty State -->

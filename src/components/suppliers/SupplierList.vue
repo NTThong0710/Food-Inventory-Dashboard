@@ -53,7 +53,7 @@
       <div>Liên hệ</div>
       <div>Email / ĐT</div>
       <div>Trạng thái</div>
-      <div class="text-right pr-6">Thao tác</div>
+      <div class="text-right pr-6"></div>
     </div>
 
     <!-- Empty State -->

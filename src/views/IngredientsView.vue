@@ -1,27 +1,47 @@
 <template>
-  <div class="flex flex-col gap-6 w-full">
+  <div class="flex flex-col gap-6 relative">
 
 
-        <!-- Toast -->
-<div class="card flex justify-center">
-  <Toast position="top-center" group="headless" @close="visible = false">
-    <template #container="{ message, closeCallback }">
-      <section class="flex flex-col p-4 gap-4 w-full bg-primary/70 rounded-xl">
-        <div class="flex items-center gap-5">
-          <i class="pi pi-cloud-download text-white dark:text-black text-2xl"></i>
-          <span class="font-bold text-base text-white dark:text-black">{{ message.summary }}</span>
-        </div>
-        <div class="flex flex-col gap-2">
-          <ProgressBar :value="progress" :showValue="false" :style="{ height: '4px' }" pt:value:class="!bg-primary-50 dark:!bg-primary-900" class="bg-primary/80!"></ProgressBar>
-          <label class="text-sm font-bold text-white dark:text-black">{{ progress }}% đã tải</label>
-        </div>
-        <div class="flex gap-4 mb-4 justify-end">
-          <Button label="Hủy" size="small" @click="closeCallback"></Button>
-        </div>
-      </section>
-    </template>
-  </Toast>
-</div>
+        <!-- Premium Download Toast -->
+    <div class="card flex justify-center">
+      <Toast position="top-center" group="headless" @close="visible = false">
+        <template #container="{ message, closeCallback }">
+          <section class="flex flex-col p-5 gap-4 w-full bg-white/10 dark:bg-black/20 backdrop-blur-xl rounded-2xl border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] min-w-[320px]">
+            <div class="flex items-center gap-4">
+              <div class="p-2 bg-[#37EC13]/20 rounded-lg">
+                <FileDown class="w-6 h-6 text-[#37EC13] animate-bounce" />
+              </div>
+              <div class="flex flex-col">
+                <span class="font-bold text-base text-white tracking-tight">{{ message.summary }}</span>
+                <span class="text-xs text-gray-400">Vui lòng đợi trong giây lát...</span>
+              </div>
+            </div>
+            
+            <div class="flex flex-col gap-2 mt-2">
+              <div class="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                <div 
+                  class="h-full bg-linear-to-r from-[#37EC13] to-[#22c55e] transition-all duration-300 ease-out shadow-[0_0_10px_#37EC13]"
+                  :style="{ width: `${progress}%` }"
+                ></div>
+              </div>
+              <div class="flex justify-between items-center text-[10px] font-medium uppercase tracking-widest text-gray-400">
+                <span>Tiến trình</span>
+                <span class="text-[#37EC13]">{{ progress }}%</span>
+              </div>
+            </div>
+
+            <div class="flex justify-end mt-2">
+              <button 
+                @click="closeCallback"
+                class="text-xs font-bold text-white/60 hover:text-white transition-colors px-3 py-1.5 rounded-md hover:bg-white/5"
+              >
+                Hủy bỏ
+              </button>
+            </div>
+          </section>
+        </template>
+      </Toast>
+    </div>
 
     <!-- Page Header -->
     <div class="flex justify-between items-center">
@@ -80,7 +100,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { Plus, Download } from 'lucide-vue-next';
+import { Plus, Download, FileDown } from 'lucide-vue-next';
 import { useInventoryStore, type Ingredient } from '@/stores/inventory';
 import IngredientForm from '@/components/inventory/IngredientForm.vue';
 import IngredientList from '@/components/inventory/IngredientList.vue';
@@ -89,8 +109,6 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 
 import { useToast } from "primevue/usetoast";
 import Toast from 'primevue/toast';
-import ProgressBar from 'primevue/progressbar';
-import Button from 'primevue/button';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 

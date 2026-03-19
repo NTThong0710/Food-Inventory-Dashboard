@@ -109,7 +109,7 @@
       <div>Danh mục</div>
       <div>Giá bán</div>
       <div>Công thức</div>
-      <div class="text-right pr-6">Thao tác</div>
+      <div class="text-right pr-6"></div>
     </div>
 
     <!-- Empty State -->
