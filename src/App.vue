@@ -19,6 +19,7 @@
       </div>
     </div>
   </Transition>
+  
   <Toast/>
 
   <!-- Main App -->
@@ -35,13 +36,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { useAuthStore } from '@/stores/auth';
-import TopNavbar from './components/layout/TopNavbar.vue';
+import { useAuthStore } from '@/features/auth/store';
+import TopNavbar from '@/shared/components/layout/TopNavbar.vue';
 import Toast from 'primevue/toast';
 
 const route = useRoute();
 const authStore = useAuthStore();
-const isLoginPage = computed(() => route.path === '/login');
+const isLoginPage = computed(() => ['/login', '/forgot-password', '/update-password'].includes(route.path));
 
 const isLoading = ref(true);
 
@@ -103,7 +104,7 @@ onMounted(() => {
 .progress-bar {
   width: 220px;
   height: 2px;
-  background: rgba(74, 222, 128, 0.15);;
+  background: rgba(74, 222, 128, 0.15);
   border-radius: 999px;
   overflow: hidden;
   opacity: 0;
