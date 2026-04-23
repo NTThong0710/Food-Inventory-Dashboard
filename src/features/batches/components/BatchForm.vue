@@ -176,6 +176,21 @@ watch(() => props.itemToEdit, (newVal) => {
   errorMessage.value = '';
 }, { immediate: true });
 
+watch(
+  [() => formData.value.ingredient_sku, () => formData.value.supplier_code],
+  ([newSku, newSup], [oldSku, oldSup]) => {
+    if (!isEditing.value && newSku && newSup && (newSku !== oldSku || newSup !== oldSup)) {
+      const supplier = suppliersStore.items.find(s => s.supplier_code === newSup);
+      if (supplier && supplier.ingredients) {
+        const quoted = supplier.ingredients.find(i => i.ingredient_sku === newSku);
+        if (quoted && quoted.quoted_price > 0) {
+          formData.value.unit_cost = quoted.quoted_price;
+        }
+      }
+    }
+  }
+);
+
 function resetForm() {
   formData.value = {
     batch_code: '',

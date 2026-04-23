@@ -15,4 +15,7 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     Toast: typeof import('primevue/toast')['default']
   }
+  export interface GlobalDirectives {
+    Tooltip: typeof import('primevue/tooltip')['default']
+  }
 }

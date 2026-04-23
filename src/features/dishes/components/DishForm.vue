@@ -38,19 +38,48 @@
           <BaseTextarea id="d-desc" label="Mô tả / Cách làm" v-model="formData.description" :rows="4" placeholder="Mô tả món ăn và cách làm..." />
 
           <!-- Image Upload -->
-          <!-- <div>
-            <label class="block text-sm font-bold text-gray-300 mb-1.5">Dish Image</label>
+         <div>
+            <label class="block text-sm font-bold text-gray-300 mb-1.5">Hình ảnh món ăn</label>
+            
+            <input 
+              type="file" 
+              ref="fileInput" 
+              class="hidden" 
+              @change="uploadImageToCloudinary" 
+              accept="image/*" 
+            />
+            
             <div
-              class="border-2 border-dashed border-[#2A362C] bg-[#0F1410] rounded-xl h-28 flex flex-col items-center justify-center text-gray-500 hover:text-gray-300 hover:border-gray-500 hover:bg-[#1B241D] cursor-pointer transition-colors group"
-              role="button"
-              tabindex="0"
-              aria-label="Upload dish image"
-              @keydown.enter.prevent="() => {}"
+              v-if="!formData.image_url"
+              @click="triggerFileInput"
+              class="relative border-2 border-dashed border-[#2A362C] bg-[#0F1410] rounded-xl h-32 flex flex-col items-center justify-center text-gray-500 hover:text-gray-300 hover:border-gray-500 hover:bg-[#1B241D] cursor-pointer transition-colors group overflow-hidden"
             >
-              <ImagePlus class="w-6 h-6 mb-1 text-gray-400 group-hover:text-white transition-colors" aria-hidden="true" />
-              <span class="text-xs font-medium">Click to upload image</span>
+              <div v-if="isUploading" class="absolute inset-0 bg-[#0F1410]/80 flex flex-col items-center justify-center z-10 backdrop-blur-sm">
+                <span class="w-6 h-6 border-2 border-[#37EC13] border-t-transparent rounded-full animate-spin mb-2"></span>
+                <span class="text-xs text-[#37EC13] font-medium">Đang tải lên...</span>
+              </div>
+
+              <ImagePlus class="w-8 h-8 mb-2 text-gray-400 group-hover:text-[#37EC13] transition-colors" />
+              <span class="text-sm font-medium">Click để tải ảnh lên</span>
             </div>
-          </div> -->
+
+            <div v-else class="relative group h-40 w-full rounded-xl overflow-hidden border border-[#2A362C]">
+              <img :src="formData.image_url" class="w-full h-full object-cover" alt="Dish preview" />
+              
+              <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                <button @click.prevent="triggerFileInput" type="button" class="px-3 py-1.5 bg-[#1B241D] hover:bg-[#2A362C] border border-[#37EC13] text-[#37EC13] rounded-lg text-sm font-medium transition-colors">
+                  Đổi ảnh
+                </button>
+                <button @click.prevent="formData.image_url = ''" type="button" class="p-1.5 bg-red-900/50 hover:bg-red-500/80 text-white rounded-lg transition-colors" title="Xóa ảnh">
+                  <Trash2 class="w-4 h-4"/>
+                </button>
+              </div>
+
+              <div v-if="isUploading" class="absolute inset-0 bg-[#0F1410]/80 flex items-center justify-center z-10">
+                <span class="w-6 h-6 border-2 border-[#37EC13] border-t-transparent rounded-full animate-spin"></span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -252,6 +281,8 @@ import type { Dish, DishIngredient } from '@/features/dishes/store';
 
 const props = defineProps<{ itemToEdit: Dish | null; isSubmitting?: boolean; }>();
 const emit = defineEmits(['save', 'cancel-edit']);
+const fileInput = ref<HTMLInputElement | null>(null);
+const isUploading = ref(false);
 const inventoryStore = useInventoryStore();
 const dishesStore = useDishesStore();
 
@@ -303,6 +334,38 @@ watch(() => props.itemToEdit, (newVal) => {
   }
   errorMessage.value = '';
 }, { immediate: true });
+
+// Auto-suggest Category based on Dish Name
+watch(() => formData.value.name, (newName) => {
+  // Only auto-suggest if user hasn't manually selected a category and name exists
+  if (!newName || formData.value.category_code || isEditing.value) return;
+  
+  const nameLower = newName.toLowerCase();
+  
+  const categoryKeywords = [
+    { keywords: ['trà', 'nước', 'sữa', 'cafe', 'cà phê', 'bia', 'sinh tố', 'nước ép', 'rượu', 'coca', 'pepsi', '7up', 'sprite'], searchStr: 'uống' }, // Đồ uống
+    { keywords: ['bò', 'gà', 'heo', 'cá', 'tôm', 'mực', 'cơm', 'phở', 'bún', 'lẩu', 'cua', 'nướng', 'hấp', 'mì', 'cháo'], searchStr: 'chính' }, // Món chính
+    { columns: ['súp', 'sup', 'salad', 'gỏi', 'nem', 'chả'], searchStr: 'khai vị' }, // Khai vị
+    { keywords: ['khoai tây', 'ngô', 'bắp', 'kim chi', 'bánh mì', 'quẩy', 'ăn kèm'], searchStr: 'kèm' }, // Ăn kèm
+    { keywords: ['chè', 'bánh', 'kem', 'trái cây', 'tráng miệng', 'flan', 'sữa chua', 'yogurt', 'rau câu'], searchStr: 'tráng miệng' } // Tráng miệng
+  ];
+
+  for (const block of categoryKeywords) {
+    // Treat 'columns' as 'keywords' if misspelled in definition above
+    const words = block.keywords || block.columns || [];
+    if (words.some(kw => nameLower.includes(kw))) {
+      // Find matching category from store
+      const matchedCat = dishesStore.categories.find(cat => 
+        cat.name.toLowerCase().includes(block.searchStr) || 
+        cat.category_code.toLowerCase().includes(block.searchStr)
+      );
+      if (matchedCat) {
+        formData.value.category_code = matchedCat.category_code;
+        break;
+      }
+    }
+  }
+});
 
 function resetForm() {
   formData.value = {
@@ -507,6 +570,46 @@ function handleSubmit() {
   
   emit('save', cleanData);
 }
+
+// Hàm kích hoạt input file ẩn
+const triggerFileInput = () => {
+  if (isUploading.value) return;
+  fileInput.value?.click();
+};
+
+// Hàm xử lý đẩy lên Cloudinary
+const uploadImageToCloudinary = async (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
+  if (!file) return;
+
+  isUploading.value = true;
+  errorMessage.value = '';
+
+  const uploadData = new FormData();
+  uploadData.append('file', file);
+  uploadData.append('upload_preset', 'dish_upload');
+
+  try {
+    const response = await fetch('https://api.cloudinary.com/v1_1/dv6njxx6x/image/upload', {
+      method: 'POST',
+      body: uploadData
+    });
+
+    if (!response.ok) throw new Error('Upload failed');
+
+    const data = await response.json();
+    formData.value.image_url = data.secure_url; // Gán URL lấy được vào form data
+    
+  } catch (error) {
+    console.error('Lỗi upload:', error);
+    errorMessage.value = 'Không thể tải ảnh lên Cloudinary. Vui lòng thử lại sau.';
+  } finally {
+    isUploading.value = false;
+    // Reset lại value của input để nếu xóa ảnh rồi chọn lại đúng ảnh đó thì trình duyệt vẫn nhận diện là onchange
+    if (fileInput.value) fileInput.value.value = '';
+  }
+};
 </script>
 
 <style scoped>

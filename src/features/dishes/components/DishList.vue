@@ -138,7 +138,7 @@
       <div v-for="item in paginatedDishes" :key="item.dish_code" 
            class="grid grid-cols-[40px_1fr] md:grid-cols-[40px_2.5fr_1.5fr_1.5fr_1.5fr_80px] gap-4 px-4 md:px-6 py-5 border-b border-[#2A362C] hover:bg-[#1A231C]/60 transition-colors items-start md:items-center group relative md:static cursor-default">
            
-        <div class="flex justify-center items-center md:mt-0 md:h-full mt-[10px]">
+        <div class="flex justify-center items-center md:mt-0 md:h-full mt-2.5">
           <input type="checkbox" v-model="selectedItems" :value="item.dish_code" class="w-4 h-4 rounded border-gray-600 outline-none text-[#37EC13] focus:ring-1 focus:ring-[#37EC13] bg-[#1B241D] cursor-pointer accent-[#37EC13]">
         </div>
 
@@ -146,7 +146,13 @@
           <!-- Name -->
           <div class="flex items-center gap-4">
             <div class="w-10 h-10 shrink-0 rounded-lg bg-[#0F1410] border border-[#2A362C] flex justify-center items-center text-gray-300 shadow-inner">
-              <Utensils class="w-5 h-5 text-gray-400" />
+              <img
+                v-if="item.image_url" 
+                :src="item.image_url" 
+                :alt="item.name" class="w-full h-full object-cover rounded-md">
+              <Utensils
+                v-else
+               class="w-5 h-5 text-gray-400" />
             </div>
             <div class="flex flex-col overflow-hidden">
               <span class="font-bold text-base text-gray-100 truncate w-full" :title="item.name">{{ item.name }}</span>
@@ -179,39 +185,41 @@
             </div>
           </div>
 
-          <!-- Actions -->
+          <!-- Actions — dropdown giống IngredientList -->
           <div class="flex items-center justify-end absolute md:static right-4 top-5 md:right-0 md:top-0">
-            <div class="relative flex items-center justify-center w-10 h-10">
-            <SpeedDial 
-              :model="getMenuItems(item)" 
-              :radius="50" 
-              type="semi-circle" 
-              direction="left"
-              :style="{ position: 'absolute', top: 'calc(50% - 2rem)', left: '0px' }" 
-              :buttonProps="{ 
-                severity: 'secondary', 
-                rounded: true, 
-                text: true, 
-                icon: 'pi pi-ellipsis-v',
-                class: 'text-gray-500 hover:text-gray-200 hover:bg-[#2A362C] transition-colors focus:ring-1 focus:ring-gray-600'
-              }" 
-            >
-            <template #item="{ item, toggleCallback }"> 
-          <button 
-            @click="(e) => { toggleCallback(e); item.command?.({ originalEvent: e, item }) }"
-            class="flex items-center justify-center p-2 rounded-full w-10 h-10 transition-colors border-2 hover:bg-[#2A362C]"
-            :class="{
-              'border-[#37EC13] text-[#37EC13] hover:text-green-300': item.label === 'Chế biến',
-              'border-gray-300 text-gray-300 hover:text-white': item.label === 'Sửa',
-              'border-red-400 text-red-400 hover:text-red-300': item.label === 'Xóa'
-            }"
-          >
-            <component :is="item.icon" class="w-5 h-5" />
-          </button>
-        </template>
-            </SpeedDial>
+            <div class="relative" v-if="authStore.hasPermission('dish_write') || true">
+              <button
+                @click="toggleMenu(item.dish_code)"
+                @blur="closeMenuDelay"
+                aria-label="Tùy chọn"
+                class="p-2 text-gray-500 hover:text-gray-200 hover:bg-[#2A362C] rounded-lg transition-colors focus:outline-none focus:ring-1 focus:ring-gray-600"
+              >
+                <MoreVertical class="w-5 h-5" />
+              </button>
+              <transition name="fade">
+                <div
+                  v-if="activeMenu === item.dish_code"
+                  class="absolute right-0 top-full mt-1 w-36 bg-[#1B241D] border border-[#2A362C] rounded-lg shadow-xl z-20 py-1 flex flex-col"
+                >
+                  <template v-if="authStore.hasPermission('dish_write')">
+                    <button
+                      @click.stop="emit('edit', item); activeMenu = null"
+                      class="flex items-center gap-2 w-full px-4 py-2 text-sm text-left text-gray-300 hover:bg-[#2A362C] hover:text-white transition-colors"
+                    >
+                      <Pencil class="w-4 h-4" /> Sửa
+                    </button>
+                    <div class="h-px bg-[#2A362C] my-1 w-full" />
+                    <button
+                      @click.stop="emit('delete', item.dish_code); activeMenu = null"
+                      class="flex items-center gap-2 w-full px-4 py-2 text-sm text-left text-red-400 hover:bg-[#2A362C] hover:text-red-300 transition-colors"
+                    >
+                      <Trash2 class="w-4 h-4" /> Xóa
+                    </button>
+                  </template>
+                </div>
+              </transition>
+            </div>
           </div>
-        </div>
         </div>
       </div>
     </div>
@@ -260,13 +268,12 @@ import type { Dish } from '@/features/dishes/store';
 import { useAuthStore } from '@/features/auth/store';
 import { getCategoryIcon, getCategoryColor } from '@/shared/lib/categoryIcons';
 import { useDebounceFn } from '@vueuse/core';
-import SpeedDial from 'primevue/speeddial';
 
 const props = defineProps<{
   dishes: Dish[]
 }>();
 
-const emit = defineEmits(['edit', 'delete', 'prepare', 'delete-multiple']);
+const emit = defineEmits(['edit', 'delete', 'delete-multiple']);
 
 const authStore = useAuthStore();
 
@@ -287,38 +294,6 @@ watch(() => props.dishes, () => {
   selectedItems.value = selectedItems.value.filter(id => props.dishes.some(d => d.dish_code === id));
 }, { deep: true });
 
-const getMenuItems = (item : any): any[] => {
-  const menus = [
-    {
-      label: 'Chế biến',
-      icon: ChefHat,
-      command: () => {
-        emit('prepare', item);
-      }
-    }
-  ];
-
-  if (authStore.hasPermission('dish_write')) {
-    menus.push(
-      {
-        label: 'Sửa',
-        icon: Pencil,
-        command: () => {
-          emit('edit', item);
-        }
-      },
-      {
-        label: 'Xóa',
-        icon: Trash2,
-        command: () => {
-          emit('delete', item.dish_code);
-        }
-      }
-    );
-  }
-
-  return menus;
-};
 
 // Filter & Search
 const searchQuery = ref('');

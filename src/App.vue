@@ -24,9 +24,9 @@
 
   <!-- Main App -->
   <div class="flex flex-col min-h-screen bg-[#132210] font-sans text-white">
-    <TopNavbar v-if="!isLoginPage" />
+    <TopNavbar v-if="!isStandalonePage" />
     <main class="flex-1 overflow-y-auto w-full relative">
-      <div class="p-4 md:p-8 w-full max-w-7xl mx-auto">
+      <div :class="isStandalonePage ? 'w-full min-h-full' : 'p-4 md:p-8 w-full max-w-7xl mx-auto'">
         <router-view />
       </div>
     </main>
@@ -42,7 +42,7 @@ import Toast from 'primevue/toast';
 
 const route = useRoute();
 const authStore = useAuthStore();
-const isLoginPage = computed(() => ['/login', '/forgot-password', '/update-password'].includes(route.path));
+const isStandalonePage = computed(() => ['/', '/login', '/forgot-password', '/update-password', '/menu', '/booking', '/c-auth', '/c-profile'].includes(route.path));
 
 const isLoading = ref(true);
 

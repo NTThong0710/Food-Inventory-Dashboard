@@ -113,7 +113,7 @@ const tooltipTemplate = (d: any) => {
       <div class="flex items-start justify-between w-full flex-col sm:flex-row gap-4">
         <div>
           <CardTitle class="text-white font-bold text-lg">Doanh thu xuất kho</CardTitle>
-          <CardDescription class="text-gray-500 text-sm mt-1">
+          <CardDescription class="text-[#6b7280] text-sm mt-1">
             Theo <span class="text-[#37EC13] font-semibold">tổng giá trị</span>
           </CardDescription>
         </div>
@@ -123,17 +123,17 @@ const tooltipTemplate = (d: any) => {
           <button 
             @click="timeFilter = 'day'" 
             class="px-3 py-1 text-xs font-semibold rounded-md transition-all duration-200"
-            :class="timeFilter === 'day' ? 'bg-[#37EC13] text-black shadow-[0_0_10px_rgba(55,236,19,0.3)]' : 'text-gray-400 hover:text-white'"
+            :class="timeFilter === 'day' ? 'bg-[#37EC13] text-black shadow-[0_0_10px_rgba(55,236,19,0.3)]' : 'text-[#9ca3af] hover:text-white'"
           >Ngày</button>
           <button 
             @click="timeFilter = 'month'" 
             class="px-3 py-1 text-xs font-semibold rounded-md transition-all duration-200"
-            :class="timeFilter === 'month' ? 'bg-[#37EC13] text-black shadow-[0_0_10px_rgba(55,236,19,0.3)]' : 'text-gray-400 hover:text-white'"
+            :class="timeFilter === 'month' ? 'bg-[#37EC13] text-black shadow-[0_0_10px_rgba(55,236,19,0.3)]' : 'text-[#9ca3af] hover:text-white'"
           >Tháng</button>
           <button 
             @click="timeFilter = 'year'" 
             class="px-3 py-1 text-xs font-semibold rounded-md transition-all duration-200"
-            :class="timeFilter === 'year' ? 'bg-[#37EC13] text-black shadow-[0_0_10px_rgba(55,236,19,0.3)]' : 'text-gray-400 hover:text-white'"
+            :class="timeFilter === 'year' ? 'bg-[#37EC13] text-black shadow-[0_0_10px_rgba(55,236,19,0.3)]' : 'text-[#9ca3af] hover:text-white'"
           >Năm</button>
         </div>
       </div>

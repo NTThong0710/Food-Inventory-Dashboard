@@ -73,7 +73,6 @@
           @edit="openEditForm"
           @delete="handleDelete"
           @delete-multiple="handleDeleteMultiple"
-          @prepare="handlePrepare"
         />
       </div>
     </section>
@@ -104,17 +103,7 @@
       @cancel="isDeleteModalOpen = false"
     />
 
-    <PromptModal
-      :isOpen="isPrepareModalOpen"
-      :title="`Chế biến &quot;${dishToPrepare?.name}&quot;`"
-      message="Nhập số phần ăn:"
-      :initialValue="1"
-      :min="1"
-      confirmText="Chế biến"
-      :isLoading="isPrepareSubmitting"
-      @confirm="confirmPrepare"
-      @cancel="closePrepareModal"
-    />
+
   </div>
 </template>
 
@@ -123,7 +112,6 @@ import { ref, onMounted } from 'vue';
 import DishForm from '@/features/dishes/components/DishForm.vue';
 import DishList from '@/features/dishes/components/DishList.vue';
 import ConfirmModal from '@/shared/components/ui/modal/ConfirmModal.vue';
-import PromptModal from '@/shared/components/ui/modal/PromptModal.vue';
 import { useDishesStore, type Dish } from '@/features/dishes/store';
 import { useInventoryStore } from '@/features/inventory/store';
 import { useAuthStore } from '@/features/auth/store';
@@ -150,12 +138,11 @@ const isDeleteModalOpen = ref(false);
 const dishToDelete = ref<string | null>(null);
 const dishesToDelete = ref<string[]>([]);
 
-const isPrepareModalOpen = ref(false);
-const dishToPrepare = ref<Dish | null>(null);
+
 
 const isSubmittingForm = ref(false);
 const isDeleteSubmitting = ref(false);
-const isPrepareSubmitting = ref(false);
+
 
 onMounted(() => {
   store.fetchDishes();
@@ -252,45 +239,7 @@ const confirmDelete = async () => {
   }
 };
 
-const handlePrepare = (dish: Dish) => {
-  dishToPrepare.value = dish;
-  isPrepareModalOpen.value = true;
-};
 
-const closePrepareModal = () => {
-  isPrepareModalOpen.value = false;
-  dishToPrepare.value = null;
-};
-
-const confirmPrepare = async (servings: number) => {
-  if (!dishToPrepare.value) return;
-
-  isPrepareSubmitting.value = true;
-  try {
-    const result = await store.prepareDish(dishToPrepare.value.dish_code, servings);
-
-    if (result.success) {
-      toast.add({
-        severity: 'success',
-        summary: 'Xuất kho thành công',
-        detail: result.message,
-        life: 5000
-      });
-      await inventoryStore.fetchIngredients();
-    } else {
-      const detailMsg = result.details ? result.details.join('\n') : result.message;
-      toast.add({
-        severity: 'error',
-        summary: result.message,
-        detail: detailMsg,
-        life: 8000
-      });
-    }
-    closePrepareModal();
-  } finally {
-    isPrepareSubmitting.value = false;
-  }
-};
 
 const downloadExcel = async () => {
   if (!visible.value) {

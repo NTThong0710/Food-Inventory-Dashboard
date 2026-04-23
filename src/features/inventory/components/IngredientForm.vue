@@ -73,10 +73,26 @@
           <option value="p/c">Cái/Hộp/Khay</option>
         </BaseSelect>
 
-        <!-- Computed Property Display: Hiển thị giá trị tính toán tự động -->
-        <div class="md:col-span-3 bg-[#121811] p-4 rounded border border-gray-700 font-bold text-lg flex justify-between">
-          <span>Ước lượng tổng chi phí:</span>
-          <span class="text-[#37EC13]">{{ estimatedTotal.toLocaleString('vi-VN') }} VND</span>
+        <!-- Supplier Prices Display -->
+        <div class="md:col-span-3 bg-[#121811] p-4 rounded border border-gray-700 mt-4">
+          <h4 class="font-bold text-gray-300 mb-3 uppercase text-sm tracking-wider">Đơn giá theo Nhà Cung Cấp</h4>
+          
+          <!-- State 1: New Ingredient or No Prices -->
+          <div v-if="!itemToEdit || !itemToEdit.supplier_prices || itemToEdit.supplier_prices.length === 0" class="text-sm text-gray-500 italic flex items-center gap-2">
+            <Lock class="w-4 h-4" />
+            Đơn giá sẽ được thiết lập tự động từ các báo giá của Nhà Cung Cấp hoặc trong phiếu Nhập Kho.
+          </div>
+          
+          <!-- State 2: Has Prices -->
+          <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div v-for="sp in itemToEdit.supplier_prices" :key="sp.supplier_code" class="flex justify-between items-center bg-[#1A231C] p-3 rounded-lg border border-[#2A362C]">
+              <div class="flex flex-col">
+                <span class="font-bold text-white text-sm">{{ sp.supplier_name }}</span>
+                <span class="text-xs text-gray-500 font-mono">{{ sp.supplier_code }}</span>
+              </div>
+              <span class="text-[#37EC13] font-bold">{{ Number(sp.price).toLocaleString('vi-VN') }} VND</span>
+            </div>
+          </div>
         </div>
 
         <div class="md:col-span-3 border-t border-gray-600 pt-4 flex justify-end gap-3 mt-4">
@@ -114,7 +130,7 @@ const emit = defineEmits(['save', 'cancel-edit'])
 const inventoryStore = useInventoryStore();
 
 const form = reactive({
-    sku: '', name: '', category_code: '', stock_quantity: 0, unit:'', unit_cost: 0
+    sku: '', name: '', category_code: '', stock_quantity: 0, unit:''
 })
 
 // onMounted chạy một lần khi component đã render xong
@@ -134,12 +150,7 @@ watch (form , (val) => {
 // bắt buộc phải có deep: true vì form là object, nếu không có thì chỉ theo dõi được khi form được gán lại (form = {...}) chứ không theo dõi được khi chỉ thay đổi 1 thuộc tính (form.sku = '...')
 
 
-// COMPUTED: Tự động tính toán giá trị mới từ dữ liệu có sẵn.
-// Khác với function thường, computed sẽ được Vue Caching (nhớ lại).
-// Nó chỉ tính lại TỔNG (quantity * cost) khi 1 trong 2 số này thay đổi.
-const estimatedTotal = computed(() => {
-    return form.stock_quantity * form.unit_cost;
-})
+
 
 // 2. COMPUTED (Validation): Kiểm tra xem form có điền đủ thông tin quan trọng không
 const isFormValid = computed(() => {
@@ -147,12 +158,10 @@ const isFormValid = computed(() => {
 })
 
 const resetForm = () => {
-    Object.assign(form, {sku: '', name: '', category_code: '', stock_quantity: 0, unit:'', unit_cost: 0, production_date: '', expiry_date: ''})
+    Object.assign(form, {sku: '', name: '', category_code: '', stock_quantity: 0, unit:'', production_date: '', expiry_date: ''})
 }
 
 const errorMessage = computed(() => {
-  if (form.unit_cost < 0 ) return "Giá trị không thể nhỏ hơn 0";
-
   const discreteUnits = ['p/c', 'cái', 'hộp', 'khay', 'chai', 'lon', 'cuộn', 'bao', 'gói'];
   const isDiscrete = discreteUnits.some(u => form.unit.toLowerCase().includes(u));
   if (isDiscrete && form.stock_quantity && !Number.isInteger(form.stock_quantity)) {
@@ -170,8 +179,7 @@ watch(() => props.itemToEdit, (newVal) => {
           name: newVal.name,
           category_code: newVal.category_code,
           stock_quantity: newVal.quantity,
-          unit: newVal.unit,
-          unit_cost: newVal.cost
+          unit: newVal.unit
         })
     }
 }, { immediate: true })
@@ -191,7 +199,6 @@ const handleSubmit = () => {
         name: form.name,
         category_code: form.category_code,
         quantity: form.stock_quantity, 
-        cost: form.unit_cost,          
         unit: form.unit,
         note: '' // Tạm thời để trống
     };

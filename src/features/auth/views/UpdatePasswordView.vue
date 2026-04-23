@@ -257,6 +257,12 @@ function validateConfirm(): boolean {
 // --- Submit ---
 const handleUpdate = async () => {
   errorMsg.value = '';
+  
+  if (!authStore.isAuthenticated) {
+    errorMsg.value = 'Phiên làm việc không hợp lệ hoặc đã hết hạn. Vui lòng mở lại liên kết từ email của bạn.';
+    return;
+  }
+
   const pwOk = validatePassword();
   const cfOk = validateConfirm();
   if (!pwOk || !cfOk) return;
@@ -267,8 +273,12 @@ const handleUpdate = async () => {
     isSuccess.value = true;
   } catch (error: any) {
     const msg: string = error.message || '';
-    if (msg.includes('expired') || msg.includes('invalid')) {
+    if (error.name === 'AbortError' || msg.toLowerCase().includes('lock broken') || msg.toLowerCase().includes('steal')) {
+      errorMsg.value = 'Có lỗi thiết lập phiên (Lock). Nếu bạn dùng lại mật khẩu cũ, vui lòng nhập mật khẩu mới hoàn toàn khác. Hoặc nhấn Lưu thử lại.';
+    } else if (msg.includes('expired') || msg.includes('invalid')) {
       errorMsg.value = 'Liên kết đặt lại đã hết hạn. Vui lòng yêu cầu liên kết mới.';
+    } else if (msg.includes('different')) {
+      errorMsg.value = 'Mật khẩu mới phải khác với mật khẩu cũ.';
     } else {
       errorMsg.value = msg || 'Cập nhật mật khẩu thất bại. Vui lòng thử lại.';
     }

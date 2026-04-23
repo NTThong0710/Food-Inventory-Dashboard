@@ -160,10 +160,15 @@ async function sendReset() {
     startCooldown();
   } catch (error: any) {
     const msg: string = error.message || '';
-    if (msg.toLowerCase().includes('rate limit') || msg.toLowerCase().includes('too many')) {
-      errorMsg.value = 'Quá nhiều yêu cầu. Vui lòng thử lại sau 1 giờ.';
+    if (msg.toLowerCase().includes('rate limit') || msg.toLowerCase().includes('too many') || msg.includes('60 seconds')) {
+      errorMsg.value = 'Quá nhiều yêu cầu. Vui lòng thử lại sau vài phút.';
     } else {
-      errorMsg.value = msg || 'Gửi email đặt lại thất bại. Vui lòng thử lại.';
+      // Dịch một số lỗi phổ biến từ Supabase
+      if (msg.includes('Database error saving new user')) {
+        errorMsg.value = 'Lỗi máy chủ cơ sở dữ liệu. Vui lòng thử lại.';
+      } else {
+        errorMsg.value = msg || 'Gửi email đặt lại thất bại. Vui lòng thử lại.';
+      }
     }
     console.error('Password reset error:', error);
   } finally {

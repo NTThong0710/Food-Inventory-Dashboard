@@ -10,6 +10,7 @@ export const useAuthStore = defineStore('auth', () => {
   const permissionsReady = ref(false);
   const role = ref<string>('staff');
   const permissions = ref<string[]>([]);
+  const profile = ref<{ full_name?: string; phone?: string } | null>(null);
 
   let initPromise: Promise<void> | null = null;
   let onAuthChangeUnsubscribe: (() => void) | null = null;
@@ -19,7 +20,7 @@ export const useAuthStore = defineStore('auth', () => {
       // Use maybeSingle() instead of single() to avoid 406 error when no profile row exists
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('role')
+        .select('role, full_name, phone')
         .eq('id', userId)
         .maybeSingle();
 
@@ -29,6 +30,7 @@ export const useAuthStore = defineStore('auth', () => {
         
       if (profileData && profileData.role) {
         role.value = profileData.role;
+        profile.value = { full_name: profileData.full_name, phone: profileData.phone };
         // Fetch permissions for this role
         const { data: permData, error: permError } = await supabase
           .from('role_permissions')
@@ -48,6 +50,7 @@ export const useAuthStore = defineStore('auth', () => {
         console.warn(`No profile found for user ${userId}. Defaulting to staff role with no permissions.`);
         role.value = 'staff';
         permissions.value = [];
+        profile.value = null;
       }
     } catch (e) {
       console.error('Failed to fetch permissions', e);
@@ -81,6 +84,7 @@ export const useAuthStore = defineStore('auth', () => {
           } else {
             role.value = 'staff';
             permissions.value = [];
+            profile.value = null;
           }
           permissionsReady.value = true;
           loading.value = false;
@@ -95,7 +99,7 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = computed(() => !!user.value);
   const userEmail = computed(() => user.value?.email);
   const displayName = computed(() => {
-    return user.value?.user_metadata?.display_name || user.value?.email?.split('@')[0] || 'User';
+    return profile.value?.full_name || user.value?.user_metadata?.display_name || user.value?.email?.split('@')[0] || 'User';
   });
 
   const hasPermission = (permissionCode: string): boolean => {
@@ -106,12 +110,18 @@ export const useAuthStore = defineStore('auth', () => {
   async function logout() {
     try {
       const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      
+      if (error) {
+        console.warn('Supabase signout returned an error (ignoring):', error);
+      }
+    } catch (error) {
+      console.error('Error logging out from Supabase:', error);
+    } finally {
+      // Always clear local state to prevent getting stuck
       user.value = null;
       session.value = null;
       role.value = 'staff';
       permissions.value = [];
+      profile.value = null;
       permissionsReady.value = false;
       // Reset initPromise so next login will re-fetch permissions
       initPromise = null;
@@ -119,9 +129,6 @@ export const useAuthStore = defineStore('auth', () => {
         onAuthChangeUnsubscribe();
         onAuthChangeUnsubscribe = null;
       }
-    } catch (error) {
-      console.error('Error logging out:', error);
-      throw error;
     }
   }
 
@@ -131,13 +138,7 @@ export const useAuthStore = defineStore('auth', () => {
         redirectTo: window.location.origin + '/update-password',
       });
       if (error) {
-        // Better error messages
-        if (error.message.includes('Email rate limit exceeded')) {
-          throw new Error('Too many reset requests. Please try again in 1 hour.');
-        } else if (error.message.includes('Email sending failed') || error.message.includes('recovery email')) {
-          throw new Error('Email service is temporarily unavailable. Please try again later or contact support.');
-        }
-        throw error;
+        throw new Error(error.message);
       }
     } catch (error: any) {
       console.error('Error sending reset email:', error);
@@ -155,6 +156,29 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function updateProfile(fullName: string, phone: string) {
+    if (!user.value) return;
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          full_name: fullName,
+          phone: phone
+        })
+        .eq('id', user.value.id);
+        
+      if (error) throw error;
+      
+      // Update local state immediately
+      if (!profile.value) profile.value = {};
+      profile.value.full_name = fullName;
+      profile.value.phone = phone;
+    } catch (err) {
+      console.error('Error updating profile:', err);
+      throw err;
+    }
+  }
+
   return {
     user,
     session,
@@ -169,6 +193,8 @@ export const useAuthStore = defineStore('auth', () => {
     initAuthListener,
     logout,
     sendPasswordResetEmail,
-    updatePassword
+    updatePassword,
+    updateProfile,
+    profile
   };
 });

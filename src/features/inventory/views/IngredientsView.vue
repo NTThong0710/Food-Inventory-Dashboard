@@ -50,7 +50,7 @@
 
       <div class="flex gap-2">
         <!-- Nút Xuất PDF: chỉ admin & hr_manager (dashboard_read) -->
-        <button
+        <!-- <button
           v-if="authStore.hasPermission('dashboard_read')"
           @click="downloadPdf"
           :disabled="isPdfExporting"
@@ -59,7 +59,7 @@
           <span v-if="isPdfExporting" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
           <FileText v-else class="w-4 h-4" aria-hidden="true" />
           {{ isPdfExporting ? 'Đang tạo PDF...' : 'Xuất PDF' }}
-        </button>
+        </button> -->
 
         <button 
           @click="downloadExcel" 

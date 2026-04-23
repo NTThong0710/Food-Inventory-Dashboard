@@ -5,7 +5,7 @@
         <div class="w-8 h-8 rounded-md bg-[#1B5E20] text-white flex justify-center items-center shadow-[0_0_10px_rgba(46,125,50,0.5)]">
           <Utensils class="w-4 h-4" aria-hidden="true" />
         </div>
-        <span class="text-white font-bold text-lg tracking-tight">KitchenOps <span class="text-gray-300 font-medium text-sm">ERP</span></span>
+        <span class="text-white font-bold text-lg tracking-tight">Nova<span class="text-[#37EC13]">Resto</span> <span class="text-gray-300 font-medium text-sm">ERP</span></span>
       </router-link>
 
       <!-- Nav Links -->
@@ -42,22 +42,80 @@
         >
           Nhà cung cấp
         </router-link>
-        <router-link 
-          v-if="authStore.hasPermission('sale_read')"
-          to="/sales" 
-          class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-          :class="$route.path.startsWith('/sales') ? 'bg-[#1B5E20] text-[#37EC13] shadow-sm' : 'text-gray-400 hover:text-gray-200 hover:bg-[#1B241D]'"
+        <!-- Kho Dropdown -->
+        <div 
+          v-if="authStore.hasPermission('sale_read') || authStore.hasPermission('batch_read')"
+          class="relative group"
         >
-          Xuất kho
-        </router-link>
-        <router-link 
-          v-if="authStore.hasPermission('batch_read')"
-          to="/batches" 
-          class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-          :class="$route.path.startsWith('/batches') ? 'bg-[#1B5E20] text-[#37EC13] shadow-sm' : 'text-gray-400 hover:text-gray-200 hover:bg-[#1B241D]'"
+          <button 
+            type="button"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 cursor-pointer"
+            :class="($route.path.startsWith('/sales') || $route.path.startsWith('/batches')) ? 'bg-[#1B5E20] text-[#37EC13] shadow-sm' : 'text-gray-400 hover:text-gray-200 hover:bg-[#1B241D]'"
+          >
+            Kho
+            <ChevronDown class="w-4 h-4 transition-transform group-hover:rotate-180" />
+          </button>
+          
+          <div class="absolute top-full left-0 mt-1 w-40 bg-[#1A2E16] border border-[#2A362C] rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden flex flex-col">
+            <router-link 
+              v-if="authStore.hasPermission('sale_read')"
+              to="/sales" 
+              class="px-4 py-3 text-sm font-medium transition-colors"
+              :class="$route.path.startsWith('/sales') ? 'bg-[#1B5E20] text-[#37EC13]' : 'text-gray-400 hover:text-gray-200 hover:bg-[#1B241D]'"
+            >
+              Xuất kho
+            </router-link>
+            <router-link 
+              v-if="authStore.hasPermission('batch_read')"
+              to="/batches" 
+              class="px-4 py-3 text-sm font-medium transition-colors"
+              :class="$route.path.startsWith('/batches') ? 'bg-[#1B5E20] text-[#37EC13]' : 'text-gray-400 hover:text-gray-200 hover:bg-[#1B241D]'"
+            >
+              Nhập kho
+            </router-link>
+          </div>
+        </div>
+        <!-- Phục vụ dropdown: POS + Sơ đồ bàn + Báo giá -->
+        <div
+          v-if="authStore.hasPermission('pos_read') || authStore.hasPermission('table_read') || authStore.hasPermission('booking_read')"
+          class="relative group"
         >
-          Nhập kho
-        </router-link>
+          <button
+            type="button"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 cursor-pointer"
+            :class="($route.path.startsWith('/pos') || $route.path.startsWith('/table-map') || $route.path.startsWith('/quotations')) ? 'bg-[#1B5E20] text-[#37EC13] shadow-sm' : 'text-gray-400 hover:text-gray-200 hover:bg-[#1B241D]'"
+          >
+            Phục vụ
+            <ChevronDown class="w-4 h-4 transition-transform group-hover:rotate-180" />
+          </button>
+
+          <div class="absolute top-full left-0 mt-1 w-44 bg-[#1A2E16] border border-[#2A362C] rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden flex flex-col">
+            <router-link
+              v-if="authStore.hasPermission('pos_read')"
+              to="/pos"
+              class="flex items-center gap-2.5 px-4 py-3 text-sm font-medium transition-colors"
+              :class="$route.path === '/pos' ? 'bg-[#1B5E20] text-[#37EC13]' : 'text-gray-400 hover:text-gray-200 hover:bg-[#1B241D]'"
+            >
+              <MonitorSmartphone class="w-4 h-4" /> Order POS
+            </router-link>
+            <router-link
+              v-if="authStore.hasPermission('table_read')"
+              to="/table-map"
+              class="flex items-center gap-2.5 px-4 py-3 text-sm font-medium transition-colors"
+              :class="$route.path.startsWith('/table-map') ? 'bg-[#1B5E20] text-[#37EC13]' : 'text-gray-400 hover:text-gray-200 hover:bg-[#1B241D]'"
+            >
+              <LayoutGrid class="w-4 h-4" /> Sơ đồ Bàn
+            </router-link>
+            <router-link
+              v-if="authStore.hasPermission('booking_read')"
+              to="/quotations"
+              class="flex items-center gap-2.5 px-4 py-3 text-sm font-medium transition-colors"
+              :class="$route.path.startsWith('/quotations') ? 'bg-[#1B5E20] text-[#37EC13]' : 'text-gray-400 hover:text-gray-200 hover:bg-[#1B241D]'"
+            >
+              <FileText class="w-4 h-4" /> Báo giá
+            </router-link>
+          </div>
+        </div>
         <!-- <router-link 
           to="/account" 
           class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
@@ -97,7 +155,7 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
 import { computed, nextTick } from 'vue'
-import { Utensils, LogOut, Sun, Moon } from 'lucide-vue-next'
+import { Utensils, LogOut, Sun, Moon, ChevronDown, MonitorSmartphone, LayoutGrid, FileText } from 'lucide-vue-next'
 import { useAuthStore } from '@/features/auth/store'
 import { useThemeStore } from '@/shared/stores/theme'
 

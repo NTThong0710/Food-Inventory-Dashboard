@@ -181,11 +181,39 @@
           </div>
 
           <!-- Price -->
-          <div class="flex flex-col md:flex-row md:items-center md:justify-center mt-2 md:mt-0 gap-1.5 md:gap-0">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-center mt-2 md:mt-0 gap-1.5 md:gap-0 relative">
             <span class="text-xs text-gray-500 md:hidden uppercase font-bold">Đơn giá:</span>
-            <span class="font-medium text-gray-200">
-              {{ formatVND(item.cost) }}
-            </span>
+            
+            <div v-if="!item.supplier_prices || item.supplier_prices.length === 0" class="font-medium text-gray-500 italic text-sm">
+              <span v-if="item.cost > 0">{{ formatVND(item.cost) }}</span>
+              <span v-else>Chưa báo giá</span>
+            </div>
+            
+            <div v-else-if="item.supplier_prices.length === 1" class="font-medium text-gray-200 text-sm">
+              {{ formatVND(item.supplier_prices[0]?.price ?? 0) }}
+              <div class="text-[10px] text-gray-500 mt-0.5 line-clamp-1 text-center hidden md:block">{{ item.supplier_prices[0]?.supplier_name }}</div>
+            </div>
+            
+            <div v-else class="relative">
+               <button @click="togglePriceMenu(item.sku)" @blur="closePriceMenuDelay" class="font-medium text-[#37EC13] flex flex-col items-center gap-0.5 hover:opacity-80 focus:outline-none">
+                 <span>Nhiều mức giá</span>
+                 <span class="text-[10px] bg-[#37EC13]/20 px-2 py-0.5 rounded-full text-white">{{ item.supplier_prices.length }} NCC</span>
+               </button>
+               
+               <transition name="fade">
+                  <div v-if="activePriceMenu === item.sku" class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 md:bottom-auto md:top-full md:mt-2 w-max min-w-[220px] bg-[#1B241D] border border-[#2A362C] rounded-xl shadow-2xl z-30 py-2 flex flex-col cursor-default font-sans">
+                     <div class="px-3 pb-2 border-b border-[#2A362C] mb-1 text-left">
+                        <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Báo giá theo Nhà Cung Cấp</span>
+                     </div>
+                     <div v-for="sp in item.supplier_prices" :key="sp.supplier_code" class="px-3 py-2 flex justify-between items-center hover:bg-[#2A362C] transition-colors border-b border-[#2A362C]/50 last:border-0">
+                        <div class="flex flex-col text-left mr-4">
+                           <span class="text-sm text-gray-200 font-bold">{{ sp.supplier_name }}</span>
+                        </div>
+                        <span class="text-sm font-black text-[#37EC13] tracking-tight">{{ formatVND(sp.price) }}</span>
+                     </div>
+                  </div>
+               </transition>
+            </div>
           </div>
 
           <!-- Category -->
@@ -435,13 +463,22 @@ const selectCategory = (cat: string) => {
   showFilterMenu.value = false;
 };
 
-// Dropdown menu state
+// Dropdown menu state for ingredients options
 const activeMenu = ref<string | null>(null);
 const toggleMenu = (sku: string) => {
   activeMenu.value = activeMenu.value === sku ? null : sku;
 };
 const closeMenuDelay = () => {
   setTimeout(() => { activeMenu.value = null; }, 200);
+};
+
+// Dropdown menu state for multiple prices
+const activePriceMenu = ref<string | null>(null);
+const togglePriceMenu = (sku: string) => {
+  activePriceMenu.value = activePriceMenu.value === sku ? null : sku;
+};
+const closePriceMenuDelay = () => {
+  setTimeout(() => { activePriceMenu.value = null; }, 200);
 };
 
 // Formatting helpers

@@ -12,15 +12,15 @@
               </div>
               <div class="flex flex-col flex-1">
                 <span class="font-bold text-base text-white">{{ message.summary }}</span>
-                <span class="text-xs text-gray-400 mt-0.5">{{ progress }}% hoàn tất</span>
+                <span class="text-xs text-[#9ca3af] mt-0.5">{{ progress }}% hoàn tất</span>
               </div>
             </div>
             <div class="w-full h-1.5 bg-[#0F1410] rounded-full overflow-hidden shrink-0 shadow-inner block">
-               <div class="h-full bg-linear-to-r from-green-500 to-[#37EC13] transition-all duration-300 ease-out rounded-full shadow-[0_0_10px_rgba(55,236,19,0.8)] will-change-[width]" 
+               <div class="h-full bg-linear-to-r from-[#22c55e] to-[#37EC13] transition-all duration-300 ease-out rounded-full shadow-[0_0_10px_rgba(55,236,19,0.8)] will-change-[width]" 
                     :style="{ width: progress + '%' }">
                </div>
             </div>
-            <button @click="closeCallback" class="absolute top-3 right-3 text-gray-500 hover:text-white transition-colors p-1" aria-label="Đóng">
+            <button @click="closeCallback" class="absolute top-3 right-3 text-[#6b7280] hover:text-white transition-colors p-1" aria-label="Đóng">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
           </section>
@@ -31,12 +31,12 @@
     <!-- Page Header -->
     <div class="flex justify-between mb-6 items-center">
       <div>
-        <h2 class="text-3xl font-bold text-amber-50">Tổng quan</h2>
-        <p class="text-gray-400 text-sm mt-1">{{ today }}</p>
+        <h2 class="text-3xl font-bold text-[#fffbeb]">Tổng quan</h2>
+        <p class="text-[#9ca3af] text-sm mt-1">{{ today }}</p>
       </div>
       <button 
         @click="downloadAllExcel" 
-        class="bg-linear-to-r from-green-500 to-[#37EC13] text-black px-5 py-2.5 rounded-xl font-black hover:scale-105 hover:shadow-[0_0_20px_rgba(55,236,19,0.5)] transition-all duration-300 flex items-center gap-2"
+        class="bg-linear-to-r from-[#22c55e] to-[#37EC13] text-black px-5 py-2.5 rounded-xl font-black hover:scale-105 hover:shadow-[0_0_20px_rgba(55,236,19,0.5)] transition-all duration-300 flex items-center gap-2"
       >
         <Download class="w-5 h-5" aria-hidden="true" />
         Xuất toàn bộ dữ liệu
@@ -49,56 +49,56 @@
       <!-- Ingredients -->
       <div class="bg-[#1A2E16] p-5 rounded-2xl border border-[#2A362C] flex flex-col gap-3">
         <div class="flex justify-between items-center">
-          <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Nguyên liệu</span>
+          <span class="text-xs font-bold text-[#9ca3af] uppercase tracking-widest">Nguyên liệu</span>
           <div class="w-8 h-8 rounded-xl bg-[#37EC13]/10 flex items-center justify-center">
             <AlignEndVertical class="w-4 h-4 text-[#37EC13]" aria-hidden="true"/>
           </div>
         </div>
         <div>
-          <p class="text-4xl font-black text-amber-50 tabular-nums">{{ inventoryStore.totalItems }}</p>
-          <p class="text-xs text-gray-500 mt-1">{{ inventoryStore.totalCategories }} danh mục</p>
+          <p class="text-4xl font-black text-[#fffbeb] tabular-nums">{{ inventoryStore.totalItems }}</p>
+          <p class="text-xs text-[#6b7280] mt-1">{{ inventoryStore.totalCategories }} danh mục</p>
         </div>
       </div>
 
       <!-- Active Dishes -->
       <div class="bg-[#1A2E16] p-5 rounded-2xl border border-[#2A362C] flex flex-col gap-3">
         <div class="flex justify-between items-center">
-          <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Món ăn đang phục vụ</span>
+          <span class="text-xs font-bold text-[#9ca3af] uppercase tracking-widest">Món ăn đang phục vụ</span>
           <div class="w-8 h-8 rounded-xl bg-[#37EC13]/10 flex items-center justify-center">
             <Utensils class="w-4 h-4 text-[#37EC13]" aria-hidden="true"/>
           </div>
         </div>
         <div>
-          <p class="text-4xl font-black text-amber-50 tabular-nums">{{ dishesStore.totalDishes }}</p>
-          <p class="text-xs text-gray-500 mt-1">trên thực đơn</p>
+          <p class="text-4xl font-black text-[#fffbeb] tabular-nums">{{ dishesStore.totalDishes }}</p>
+          <p class="text-xs text-[#6b7280] mt-1">trên thực đơn</p>
         </div>
       </div>
 
       <!-- Inventory Value -->
       <div class="bg-[#1A241B] p-5 rounded-2xl border border-[#2A362C] flex flex-col gap-3">
         <div class="flex justify-between items-center">
-          <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Giá trị tồn kho</span>
+          <span class="text-xs font-bold text-[#9ca3af] uppercase tracking-widest">Giá trị tồn kho</span>
           <div class="w-8 h-8 rounded-xl bg-[#37EC13]/10 flex items-center justify-center">
             <DollarSign class="w-4 h-4 text-[#37EC13]" aria-hidden="true"/>
           </div>
         </div>
         <div>
-          <p class="text-3xl font-black text-amber-50 tabular-nums leading-tight">{{ currencyStore.formatShort(inventoryStore.grandTotalValue) }}</p>
-          <p class="text-xs text-gray-500 mt-1">tổng giá trị tồn kho</p>
+          <p class="text-3xl font-black text-[#fffbeb] tabular-nums leading-tight">{{ currencyStore.formatShort(inventoryStore.grandTotalValue) }}</p>
+          <p class="text-xs text-[#6b7280] mt-1">tổng giá trị tồn kho</p>
         </div>
       </div>
 
       <!-- Avg Dish Cost -->
       <div class="bg-[#1A241B] p-5 rounded-2xl border border-[#2A362C] flex flex-col gap-3">
         <div class="flex justify-between items-center">
-          <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Chi phí món ăn TB</span>
+          <span class="text-xs font-bold text-[#9ca3af] uppercase tracking-widest">Chi phí món ăn TB</span>
           <div class="w-8 h-8 rounded-xl bg-[#37EC13]/10 flex items-center justify-center">
             <Receipt class="w-4 h-4 text-[#37EC13]" aria-hidden="true"/>
           </div>
         </div>
         <div>
-          <p class="text-3xl font-black text-amber-50 tabular-nums leading-tight">{{ avgDishCostFormatted }}</p>
-          <p class="text-xs text-gray-500 mt-1">trung bình mỗi món</p>
+          <p class="text-3xl font-black text-[#fffbeb] tabular-nums leading-tight">{{ avgDishCostFormatted }}</p>
+          <p class="text-xs text-[#6b7280] mt-1">trung bình mỗi món</p>
         </div>
       </div>
 
@@ -119,18 +119,25 @@
 
     </div>
 
-    <!-- Row 3: Recent Dishes Table -->
+    <!-- Row 3: AI Forecast Chart -->
+    <div class="w-full mb-6 relative">
+       <!-- Gradient glow behind the chart -->
+       <div class="absolute -inset-1 bg-gradient-to-r from-[#37EC13]/20 to-purple-500/20 blur-xl rounded-3xl opacity-50 pointer-events-none"></div>
+       <AIForecastChart class="relative z-10" />
+    </div>
+
+    <!-- Row 4: Recent Dishes Table -->
     <div class="bg-[#1A2E16] border border-[#2A362C] rounded-2xl overflow-hidden">
       <div class="px-6 py-5 border-b border-[#2A362C] flex justify-between items-center">
         <div>
           <h3 class="font-bold text-white text-base">Món ăn gần đây</h3>
-          <p class="text-gray-500 text-xs mt-0.5">Các món mới nhất trên thực đơn</p>
+          <p class="text-[#6b7280] text-xs mt-0.5">Các món mới nhất trên thực đơn</p>
         </div>
         <router-link to="/dishes" class="text-xs text-[#37EC13] hover:underline font-medium">Xem tất cả</router-link>
       </div>
 
       <!-- Empty state -->
-      <div v-if="dishesStore.items.length === 0" class="flex flex-col items-center justify-center py-12 text-gray-500 text-sm">
+      <div v-if="dishesStore.items.length === 0" class="flex flex-col items-center justify-center py-12 text-[#6b7280] text-sm">
         <Utensils class="w-8 h-8 mb-2 opacity-30" aria-hidden="true"/>
         <p>Chưa có món ăn nào</p>
       </div>
@@ -138,7 +145,7 @@
       <!-- Table -->
       <template v-else>
         <!-- Header -->
-        <div class="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr] gap-4 px-6 py-3 bg-[#132210] text-[11px] font-bold text-gray-500 uppercase tracking-widest">
+        <div class="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr] gap-4 px-6 py-3 bg-[#132210] text-[11px] font-bold text-[#6b7280] uppercase tracking-widest">
           <div>Tên món ăn</div>
           <div>Danh mục</div>
           <div class="text-right">Giá bán</div>
@@ -151,12 +158,12 @@
             :key="dish.dish_code"
             class="grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr_1fr] gap-2 md:gap-4 px-6 py-4 hover:bg-[#1F2B1E]/60 transition-colors items-center"
           >
-            <p class="font-semibold text-sm text-gray-100 truncate">{{ dish.name }}</p>
+            <p class="font-semibold text-sm text-[#f3f4f6] truncate">{{ dish.name }}</p>
             <span class="text-xs font-medium text-[#37EC13]">{{ dish.category || '—' }}</span>
-            <p class="text-sm font-bold text-amber-50 md:text-right tabular-nums">
+            <p class="text-sm font-bold text-[#fffbeb] md:text-right tabular-nums">
               {{ dish.selling_price ? dish.selling_price.toLocaleString('vi-VN') + ' ₫' : '—' }}
             </p>
-            <p class="text-sm text-gray-400 md:text-right tabular-nums">
+            <p class="text-sm text-[#9ca3af] md:text-right tabular-nums">
               {{ dish.selling_price ? (dish.selling_price * 0.6).toLocaleString('vi-VN', { maximumFractionDigits: 0 }) + ' ₫' : '—' }}
             </p>
           </div>
@@ -172,6 +179,7 @@ import { ref, computed, onMounted } from 'vue';
 import { AlignEndVertical, Utensils, DollarSign, Receipt, Download } from 'lucide-vue-next';
 import WebsiteVisitsChart from '@/shared/components/ui/chart/WebsiteVisitsChart.vue';
 import RevenueChart from '@/shared/components/ui/chart/RevenueChart.vue';
+import AIForecastChart from '@/shared/components/ui/chart/AIForecastChart.vue';
 import { useInventoryStore } from '@/features/inventory/store';
 import { useDishesStore } from '@/features/dishes/store';
 import { useSuppliersStore } from '@/features/suppliers/store';
