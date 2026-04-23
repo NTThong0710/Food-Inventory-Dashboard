@@ -15,7 +15,7 @@ onMounted(async () => {
   }
   
   if (uniqueIngredients.value.length > 0 && !selectedSku.value) {
-    selectedSku.value = uniqueIngredients.value[0].sku;
+    selectedSku.value = uniqueIngredients.value[0]!.sku; // nhớ thêm ! để đảm bảo không bị lỗi undefined
   }
 });
 
@@ -29,7 +29,7 @@ const uniqueIngredients = computed(() => {
 
 watch(uniqueIngredients, (newVal) => {
   if (newVal.length > 0 && !selectedSku.value) {
-    selectedSku.value = newVal[0].sku;
+    selectedSku.value = newVal[0]!.sku;
   }
 });
 

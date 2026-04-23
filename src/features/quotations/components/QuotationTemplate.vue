@@ -60,7 +60,7 @@
         </thead>
         <tbody>
           <tr v-for="(item, index) in invoiceItems" :key="index" class="border-b border-[#f3f4f6]">
-            <td class="py-4 px-4 text-[#6b7280] font-medium">{{ index + 1 }}</td>
+            <td class="py-4 px-4 text-[#6b7280] font-medium">{{ Number(index) + 1 }}</td>
             <td class="py-4 px-4 font-bold text-[#111827]">{{ item.name }}</td>
             <td class="py-4 px-4 text-right text-[#4b5563] font-medium">{{ formatCurrency(item.price) }}</td>
             <td class="py-4 px-4 text-center font-bold text-[#374151]">{{ item.quantity }}</td>
