@@ -326,6 +326,8 @@ const displayLaborCost = computed({
   }
 });
 
+const autoSelectedCategoryCode = ref<string | null>(null);
+
 watch(() => props.itemToEdit, (newVal) => {
   if (newVal) {
     formData.value = JSON.parse(JSON.stringify(newVal));
@@ -340,8 +342,13 @@ let aiSuggestTimeout: any = null;
 const isPredictingCategory = ref(false);
 
 watch(() => formData.value.name, (newName) => {
-  // Only auto-suggest if user hasn't manually selected a category and name exists
-  if (!newName || formData.value.category_code || isEditing.value) return;
+  // Không gọi AI nếu rỗng hoặc đang trong chế độ Edit
+  if (!newName || isEditing.value) return;
+
+  // Nếu đã có danh mục, và danh mục đó KHÔNG PHẢI do AI tự chọn (tức là user chọn tay), thì không ghi đè
+  if (formData.value.category_code && formData.value.category_code !== autoSelectedCategoryCode.value) {
+    return;
+  }
   
   // Xóa timeout cũ nếu user đang gõ liên tục
   if (aiSuggestTimeout) clearTimeout(aiSuggestTimeout);
@@ -350,8 +357,7 @@ watch(() => formData.value.name, (newName) => {
   aiSuggestTimeout = setTimeout(async () => {
     isPredictingCategory.value = true;
     try {
-      // LƯU Ý: THAY ĐƯỜNG LINK NÀY BẰNG ĐƯỜNG LINK TRÊN RENDER CỦA BẠN
-      const API_URL = 'https://food-ai-api.onrender.com/predict'; 
+      const API_URL = 'https://food-prediction-category-ai-api.onrender.com/predict'; 
       
       const response = await fetch(API_URL, {
         method: 'POST',
@@ -362,16 +368,19 @@ watch(() => formData.value.name, (newName) => {
       const data = await response.json();
       
       if (data.category) {
-        const predictedCategory = data.category.toLowerCase(); // VD: "món chính"
-        
+        const predictedCategory = data.category.toLowerCase().trim(); // VD: "món chính"
+
         // Khớp tên do AI trả về với danh sách categories trong Database
-        const matchedCat = dishesStore.categories.find(cat => 
-          cat.name.toLowerCase() === predictedCategory ||
-          cat.name.toLowerCase().includes(predictedCategory)
-        );
+        const matchedCat = dishesStore.categories.find(cat => {
+          const catName = cat.name.toLowerCase().trim();
+          return catName === predictedCategory || 
+                 catName.includes(predictedCategory) || 
+                 predictedCategory.includes(catName);
+        });
         
-        if (matchedCat && !formData.value.category_code) {
+        if (matchedCat) {
           formData.value.category_code = matchedCat.category_code;
+          autoSelectedCategoryCode.value = matchedCat.category_code;
         }
       }
     } catch (error) {
@@ -383,6 +392,7 @@ watch(() => formData.value.name, (newName) => {
 });
 
 function resetForm() {
+  autoSelectedCategoryCode.value = null;
   formData.value = {
     dish_code: '',
     name: '',
