@@ -6,7 +6,7 @@ const router = createRouter({
   routes: [
     {path: '/', name: 'landing', component: () => import('../features/landing/views/LandingPageView.vue'), meta: { requiresAuth: false }},
     {path: '/menu', name: 'menu', component: () => import('../features/customer/views/MenuView.vue'), meta: { requiresAuth: false }},
-    {path: '/booking', name: 'booking', component: () => import('../features/customer/views/BookingView.vue'), meta: { requiresAuth: false }},
+    {path: '/booking', name: 'booking', component: () => import('../features/customer/views/BookingView.vue'), meta: { requiresAuth: true }},
     {path: '/c-auth', name: 'c-auth', component: () => import('../features/customer/views/CustomerAuthView.vue'), meta: { requiresAuth: false }},
     {path: '/c-profile', name: 'c-profile', component: () => import('../features/customer/views/CustomerProfileView.vue'), meta: { requiresAuth: true }},
     {path: '/login', name: 'login', component: () => import('../features/auth/views/LoginView.vue'), meta: { requiresAuth: false }},

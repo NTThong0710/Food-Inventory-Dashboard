@@ -29,8 +29,24 @@ export const useCustomerStore = defineStore('customer', {
       return true;
     },
     async register(email: string, password: string, fullName: string, phone: string) {
-      const { data, error } = await supabase.auth.signUp({ email, password });
+      const { data, error } = await supabase.auth.signUp({
+        email, 
+        password,
+        options: {
+          emailRedirectTo: window.location.origin,
+          data: {
+            full_name: fullName,
+            phone: phone,
+            role: 'customer'
+          }
+        }
+      });
       if (error) throw error;
+      
+      // Check if email is already registered (identities length is 0 when prevent email enumeration is ON)
+      if (data.user && data.user.identities && data.user.identities.length === 0) {
+        throw new Error('Email này đã được đăng ký. Vui lòng sử dụng email khác.');
+      }
       
       if (data.user) {
         const { error: profileError } = await supabase.from('profiles').insert({

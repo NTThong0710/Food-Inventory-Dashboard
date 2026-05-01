@@ -333,6 +333,7 @@
       header="Xác nhận thanh toán"
       :style="{ width: '400px' }"
       modal
+      dismissable-mask
       class="pos-dark-dialog"
       :pt="{
         root: 'bg-[#132210] border border-[#2A362C] rounded-2xl overflow-hidden',
@@ -341,7 +342,7 @@
         footer: 'bg-[#1A2E16] border-t border-[#2A362C] px-6 py-4 flex justify-between'
       }"
     >
-      <div v-if="posStore.selectedOrder">
+      <div v-if="posStore.selectedOrder" class="py-4">
         <Wallet class="w-16 h-16 text-[#37EC13] mx-auto mb-4 opacity-80" />
         <h3 class="text-xl font-bold text-white mb-2">Thanh toán phiếu <span class="text-[#37EC13]">Bàn {{ posStore.selectedOrder.table_number || 'Sảnh' }}</span>?</h3>
         <p class="text-gray-400 mb-5 text-sm">Vui lòng kiểm tra kỹ số tiền. Hành động này không thể hoàn tác.</p>
@@ -353,15 +354,17 @@
         </div>
       </div>
       
-      <template #footer>
-        <Button label="Hủy thao tác" text @click="showCheckoutConfirm = false" class="text-gray-400 hover:text-white" />
-        <Button
-          label="Xác nhận thu tiền"
-          icon="pi pi-check"
-          @click="proceedCheckout"
-          class="bg-[#37EC13] hover:bg-[#2ecc11] text-black border-none font-bold px-4 py-2.5 rounded-xl shadow-lg shadow-[#37EC13]/20"
-          :loading="posStore.isUpdating"
-        />
+      <template #footer class="">
+        <div class="pt-4 flex justify-end gap-3">
+          <Button label="Hủy thao tác" text @click="showCheckoutConfirm = false" class="text-gray-400 hover:text-white" />
+          <Button
+            label="Xác nhận thu tiền"
+            icon="pi pi-check"
+            @click="proceedCheckout"
+            class="bg-[#37EC13] hover:bg-[#2ecc11] text-black border-none font-bold px-4 py-2.5 rounded-xl shadow-lg shadow-[#37EC13]/20"
+            :loading="posStore.isUpdating"
+          />
+        </div>
       </template>
     </Dialog>
 

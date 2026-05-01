@@ -5,7 +5,7 @@ on:
     # Chạy vào 17:00 UTC (Tương đương 00:00 - Nửa đêm giờ Việt Nam)
     - cron: '0 17 * * *'
   
-  # Cho phép bro có một nút mồi chạy bằng tay (Manual trigger) trên giao diện GitHub
+  # Cho phép có một nút mồi chạy bằng tay (Manual trigger) trên giao diện GitHub
   workflow_dispatch:
 
 jobs:

@@ -55,7 +55,7 @@
               >
             </div>
             <p v-if="emailError" class="mt-1.5 text-xs text-red-400 flex items-center gap-1">
-              <AlertCircle class="w-3.5 h-3.5 flex-shrink-0" />
+              <AlertCircle class="w-3.5 h-3.5 shrink-0" />
               {{ emailError }}
             </p>
           </div>

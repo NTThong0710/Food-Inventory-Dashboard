@@ -335,36 +335,51 @@ watch(() => props.itemToEdit, (newVal) => {
   errorMessage.value = '';
 }, { immediate: true });
 
-// Auto-suggest Category based on Dish Name
+// Auto-suggest Category based on Dish Name using AI API
+let aiSuggestTimeout: any = null;
+const isPredictingCategory = ref(false);
+
 watch(() => formData.value.name, (newName) => {
   // Only auto-suggest if user hasn't manually selected a category and name exists
   if (!newName || formData.value.category_code || isEditing.value) return;
   
-  const nameLower = newName.toLowerCase();
+  // Xóa timeout cũ nếu user đang gõ liên tục
+  if (aiSuggestTimeout) clearTimeout(aiSuggestTimeout);
   
-  const categoryKeywords = [
-    { keywords: ['trà', 'nước', 'sữa', 'cafe', 'cà phê', 'bia', 'sinh tố', 'nước ép', 'rượu', 'coca', 'pepsi', '7up', 'sprite'], searchStr: 'uống' }, // Đồ uống
-    { keywords: ['bò', 'gà', 'heo', 'cá', 'tôm', 'mực', 'cơm', 'phở', 'bún', 'lẩu', 'cua', 'nướng', 'hấp', 'mì', 'cháo'], searchStr: 'chính' }, // Món chính
-    { columns: ['súp', 'sup', 'salad', 'gỏi', 'nem', 'chả'], searchStr: 'khai vị' }, // Khai vị
-    { keywords: ['khoai tây', 'ngô', 'bắp', 'kim chi', 'bánh mì', 'quẩy', 'ăn kèm'], searchStr: 'kèm' }, // Ăn kèm
-    { keywords: ['chè', 'bánh', 'kem', 'trái cây', 'tráng miệng', 'flan', 'sữa chua', 'yogurt', 'rau câu'], searchStr: 'tráng miệng' } // Tráng miệng
-  ];
-
-  for (const block of categoryKeywords) {
-    // Treat 'columns' as 'keywords' if misspelled in definition above
-    const words = block.keywords || block.columns || [];
-    if (words.some(kw => nameLower.includes(kw))) {
-      // Find matching category from store
-      const matchedCat = dishesStore.categories.find(cat => 
-        cat.name.toLowerCase().includes(block.searchStr) || 
-        cat.category_code.toLowerCase().includes(block.searchStr)
-      );
-      if (matchedCat) {
-        formData.value.category_code = matchedCat.category_code;
-        break;
+  // Đợi user gõ xong (800ms) rồi mới gọi API để đỡ tốn tài nguyên
+  aiSuggestTimeout = setTimeout(async () => {
+    isPredictingCategory.value = true;
+    try {
+      // LƯU Ý: THAY ĐƯỜNG LINK NÀY BẰNG ĐƯỜNG LINK TRÊN RENDER CỦA BẠN
+      const API_URL = 'https://food-ai-api.onrender.com/predict'; 
+      
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newName })
+      });
+      
+      const data = await response.json();
+      
+      if (data.category) {
+        const predictedCategory = data.category.toLowerCase(); // VD: "món chính"
+        
+        // Khớp tên do AI trả về với danh sách categories trong Database
+        const matchedCat = dishesStore.categories.find(cat => 
+          cat.name.toLowerCase() === predictedCategory ||
+          cat.name.toLowerCase().includes(predictedCategory)
+        );
+        
+        if (matchedCat && !formData.value.category_code) {
+          formData.value.category_code = matchedCat.category_code;
+        }
       }
+    } catch (error) {
+      console.error("Lỗi khi gọi AI API:", error);
+    } finally {
+      isPredictingCategory.value = false;
     }
-  }
+  }, 800);
 });
 
 function resetForm() {

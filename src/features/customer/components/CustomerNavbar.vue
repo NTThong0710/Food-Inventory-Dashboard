@@ -9,7 +9,7 @@
       </router-link>
 
       <div class="hidden md:flex gap-1 ml-8">
-        <router-link to="/booking" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-[#132210] transition-colors" exact-active-class="text-white bg-[#132210] border border-[#22c55e]/30">Đặt Bàn</router-link>
+        <router-link v-if="authStore.isAuthenticated" to="/booking" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-[#132210] transition-colors" exact-active-class="text-white bg-[#132210] border border-[#22c55e]/30">Đặt Bàn</router-link>
         <router-link to="/menu" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-[#132210] transition-colors" exact-active-class="text-white bg-[#132210] border border-[#22c55e]/30">Thực Đơn</router-link>
       </div>
     </div>
@@ -23,11 +23,8 @@
       </button>
       
       <div v-if="!authStore.isAuthenticated" class="hidden sm:flex gap-3">
-        <router-link to="/login" class="px-4 py-2 rounded-lg text-sm font-medium text-white hover:bg-white/10 transition-colors">
+        <router-link to="/login" class="px-6 py-2 rounded-full bg-[#132210] border border-[#22c55e]/30 hover:border-[#4ade80]/60 text-white text-sm font-medium transition-all">
           Đăng Nhập
-        </router-link>
-        <router-link to="/login" class="px-4 py-2 rounded-full bg-[#132210] border border-[#22c55e]/30 hover:border-[#4ade80]/60 text-white text-sm font-medium transition-all">
-          Quản trị
         </router-link>
       </div>
 
