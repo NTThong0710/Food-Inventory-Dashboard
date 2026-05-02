@@ -29,10 +29,11 @@
         <router-link 
           v-if="authStore.hasPermission('dish_read')"
           to="/dishes" 
-          class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          class="px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5"
           :class="$route.path.startsWith('/dishes') ? 'bg-[#1B5E20] text-[#37EC13] shadow-sm' : 'text-gray-400 hover:text-gray-200 hover:bg-[#1B241D]'"
         >
           Món ăn
+          <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#37EC13]/20 text-[#37EC13] border border-[#37EC13]/30">AI</span>
         </router-link>
         <router-link 
           v-if="authStore.hasPermission('supplier_read')"
@@ -68,10 +69,11 @@
             <router-link 
               v-if="authStore.hasPermission('batch_read')"
               to="/batches" 
-              class="px-4 py-3 text-sm font-medium transition-colors"
+              class="px-4 py-3 text-sm font-medium transition-colors flex items-center justify-between"
               :class="$route.path.startsWith('/batches') ? 'bg-[#1B5E20] text-[#37EC13]' : 'text-gray-400 hover:text-gray-200 hover:bg-[#1B241D]'"
             >
               Nhập kho
+              <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#37EC13]/20 text-[#37EC13] border border-[#37EC13]/30">AI</span>
             </router-link>
           </div>
         </div>

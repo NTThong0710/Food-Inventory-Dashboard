@@ -18,7 +18,15 @@
           <BaseInput id="d-code" label="Mã món ăn" v-model="formData.dish_code" :disabled="isEditing" required placeholder="VD: MON_001" />
 
           <!-- Dish Name -->
-          <BaseInput id="d-name" label="Tên món ăn" v-model="formData.name" placeholder="VD: Bò bít tết" />
+          <div>
+            <BaseInput id="d-name" label="Tên món ăn" v-model="formData.name" placeholder="VD: Bò bít tết" />
+            <p v-if="isPredictingCategory" class="text-[10px] text-[#37EC13] mt-1 pl-1 flex items-center gap-1 animate-pulse">
+              <span class="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin"></span> AI đang phân tích danh mục...
+            </p>
+            <p v-else class="text-[10px] text-gray-500 mt-1 pl-1 flex items-center gap-1">
+              <Sparkles class="w-3 h-3 text-[#37EC13]" /> Auto phân loại món ăn khi bạn gõ
+            </p>
+          </div>
 
           <!-- Category -->
           <BaseSelect id="d-cat" label="Danh mục" v-model="formData.category_code" placeholder="Chọn danh mục">
@@ -270,7 +278,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import { ChevronDown, Plus, Trash2, Search, ImagePlus, Package, AlertCircle } from 'lucide-vue-next';
+import { ChevronDown, Plus, Trash2, Search, ImagePlus, Package, AlertCircle, Sparkles } from 'lucide-vue-next';
 import BaseInput from '@/shared/components/ui/BaseInput.vue';
 import BaseSelect from '@/shared/components/ui/BaseSelect.vue';
 import BaseTextarea from '@/shared/components/ui/BaseTextarea.vue';
@@ -356,6 +364,12 @@ watch(() => formData.value.name, (newName) => {
   // Đợi user gõ xong (800ms) rồi mới gọi API để đỡ tốn tài nguyên
   aiSuggestTimeout = setTimeout(async () => {
     isPredictingCategory.value = true;
+    // Clear old errors before predicting
+    if (errorMessage.value === "Tên này có vẻ không phải là món ăn hoặc thức uống." || 
+        errorMessage.value === "Tên bạn nhập có vẻ không hợp lệ.") {
+      errorMessage.value = '';
+    }
+    
     try {
       const API_URL = 'https://food-prediction-category-ai-api.onrender.com/predict'; 
       
@@ -366,6 +380,14 @@ watch(() => formData.value.name, (newName) => {
       });
       
       const data = await response.json();
+      
+      // Xử lý nếu API trả về không phải là món ăn
+      if (data.is_food === false) {
+        errorMessage.value = data.message || "Tên này có vẻ không phải là món ăn hoặc thức uống.";
+        formData.value.category_code = undefined;
+        autoSelectedCategoryCode.value = null;
+        return;
+      }
       
       if (data.category) {
         const predictedCategory = data.category.toLowerCase().trim(); // VD: "món chính"
@@ -381,6 +403,8 @@ watch(() => formData.value.name, (newName) => {
         if (matchedCat) {
           formData.value.category_code = matchedCat.category_code;
           autoSelectedCategoryCode.value = matchedCat.category_code;
+          // Xóa thông báo lỗi nếu AI đoán ra danh mục hợp lệ
+          errorMessage.value = '';
         }
       }
     } catch (error) {

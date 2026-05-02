@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-[#1F291E] border border-gray-700 rounded-xl p-6 shadow-md text-white">
+  <div class="bg-[#1F291E] border border-gray-700 p-6 shadow-md text-white">
     <div class="flex justify-between items-center mb-6">
       <div>
         <h3 class="font-bold text-[20px] text-amber-50">
@@ -86,6 +86,93 @@
         <BaseInput id="b-exp" type="date" label="Hạn sử dụng" v-model="formData.expiry_date" />
       </div>
 
+      <!-- AI Inspection Section -->
+      <div v-if="!isEditing" class="p-5 bg-[#1B241D] rounded-xl border border-[#2A362C] space-y-4 md:col-span-2">
+        <h4 class="font-bold text-[#37EC13] flex items-center gap-2">
+          <ScanSearch class="w-5 h-5"/> Kiểm định hình ảnh lô hàng bằng AI
+        </h4>
+        <p class="text-xs text-gray-400">Vui lòng tải lên 2 ảnh (mặt trước và mặt sau) của thùng hàng để AI tự động kiểm tra lỗi (rách, móp...).</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Front Image -->
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-300">Ảnh mặt trước</label>
+            <input type="file" ref="frontFileInput" class="hidden" @change="(e) => handleImageUpload('front', e)" accept="image/*" />
+            
+            <div v-if="!frontResultImage && !frontImagePreview" @click="frontFileInput?.click()" class="border-2 border-dashed border-[#2A362C] bg-[#0F1410] rounded-lg h-40 flex flex-col items-center justify-center text-gray-500 hover:text-[#37EC13] hover:border-[#37EC13] cursor-pointer transition-colors relative">
+              <ImagePlus class="w-8 h-8 mb-2" />
+              <span class="text-xs">Tải ảnh lên</span>
+              <div v-if="isInspectingFront" class="absolute inset-0 bg-[#0F1410]/80 flex flex-col items-center justify-center rounded-lg z-10">
+                <span class="w-6 h-6 border-2 border-[#37EC13] border-t-transparent rounded-full animate-spin mb-2"></span>
+                <span class="text-xs text-[#37EC13]">AI đang quét...</span>
+              </div>
+            </div>
+            
+            <div v-else class="relative rounded-lg overflow-hidden border border-[#2A362C] h-40 group">
+              <img :src="frontResultImage || frontImagePreview" class="w-full h-full object-contain bg-black" />
+              <div v-if="frontDefects.length > 0" class="absolute top-2 right-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg animate-pulse">
+                Phát hiện lỗi!
+              </div>
+              <div v-else-if="frontResultImage" class="absolute top-2 right-2 bg-[#37EC13] text-black text-[10px] font-bold px-2 py-1 rounded shadow-lg">
+                An toàn
+              </div>
+              <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                <button @click.prevent="frontFileInput?.click()" type="button" class="px-3 py-1.5 bg-[#1B241D] text-[#37EC13] text-xs rounded-lg border border-[#37EC13] hover:bg-[#2A362C]">Đổi ảnh</button>
+                <button @click.prevent="clearImage('front')" type="button" class="p-1.5 bg-red-900/50 text-white rounded-lg border border-transparent hover:border-red-500 hover:bg-red-500/80 transition-colors" title="Xóa ảnh">
+                  <Trash2 class="w-4 h-4"/>
+                </button>
+              </div>
+            </div>
+            <!-- Defect List -->
+            <div v-if="frontDefects.length > 0" class="text-xs text-red-400 mt-1">
+              ❌ Lỗi: <span v-for="(d, i) in frontDefects" :key="i">{{ d.label }} ({{ (d.confidence * 100).toFixed(0) }}%)<span v-if="i < frontDefects.length-1">, </span></span>
+            </div>
+          </div>
+
+          <!-- Back Image -->
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-300">Ảnh mặt sau</label>
+            <input type="file" ref="backFileInput" class="hidden" @change="(e) => handleImageUpload('back', e)" accept="image/*" />
+            
+            <div v-if="!backResultImage && !backImagePreview" @click="backFileInput?.click()" class="border-2 border-dashed border-[#2A362C] bg-[#0F1410] rounded-lg h-40 flex flex-col items-center justify-center text-gray-500 hover:text-[#37EC13] hover:border-[#37EC13] cursor-pointer transition-colors relative">
+              <ImagePlus class="w-8 h-8 mb-2" />
+              <span class="text-xs">Tải ảnh lên</span>
+              <div v-if="isInspectingBack" class="absolute inset-0 bg-[#0F1410]/80 flex flex-col items-center justify-center rounded-lg z-10">
+                <span class="w-6 h-6 border-2 border-[#37EC13] border-t-transparent rounded-full animate-spin mb-2"></span>
+                <span class="text-xs text-[#37EC13]">AI đang quét...</span>
+              </div>
+            </div>
+            
+            <div v-else class="relative rounded-lg overflow-hidden border border-[#2A362C] h-40 group">
+              <img :src="backResultImage || backImagePreview" class="w-full h-full object-contain bg-black" />
+              <div v-if="backDefects.length > 0" class="absolute top-2 right-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg animate-pulse">
+                Phát hiện lỗi!
+              </div>
+              <div v-else-if="backResultImage" class="absolute top-2 right-2 bg-[#37EC13] text-black text-[10px] font-bold px-2 py-1 rounded shadow-lg">
+                An toàn
+              </div>
+              <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                <button @click.prevent="backFileInput?.click()" type="button" class="px-3 py-1.5 bg-[#1B241D] text-[#37EC13] text-xs rounded-lg border border-[#37EC13] hover:bg-[#2A362C]">Đổi ảnh</button>
+                <button @click.prevent="clearImage('back')" type="button" class="p-1.5 bg-red-900/50 text-white rounded-lg border border-transparent hover:border-red-500 hover:bg-red-500/80 transition-colors" title="Xóa ảnh">
+                  <Trash2 class="w-4 h-4"/>
+                </button>
+              </div>
+            </div>
+            <!-- Defect List -->
+            <div v-if="backDefects.length > 0" class="text-xs text-red-400 mt-1">
+              ❌ Lỗi: <span v-for="(d, i) in backDefects" :key="i">{{ d.label }} ({{ (d.confidence * 100).toFixed(0) }}%)<span v-if="i < backDefects.length-1">, </span></span>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="isAiRejected" class="p-3 bg-red-900/30 border border-red-500/50 rounded-lg text-red-400 text-sm flex items-center gap-2 mt-2">
+          <AlertCircle class="w-5 h-5 shrink-0"/> AI phát hiện lô hàng có hư hỏng. Vui lòng hoàn trả hoặc nhập biên bản từ chối!
+        </div>
+        <div v-else-if="isAiPassed" class="p-3 bg-[#37EC13]/10 border border-[#37EC13]/30 rounded-lg text-[#37EC13] text-sm flex items-center gap-2 mt-2">
+          <CheckCircle2 class="w-5 h-5 shrink-0"/> Lô hàng đạt tiêu chuẩn hình thức.
+        </div>
+      </div>
+
       <!-- Computed Total -->
       <div v-if="formData.quantity && formData.unit_cost" class="p-4 bg-[#132210] rounded-lg border border-[#2A362C]">
         <div class="flex justify-between items-center">
@@ -99,7 +186,7 @@
         <button type="button" @click="$emit('cancel-edit')" class="px-6 py-3 bg-gray-700 text-white font-bold hover:bg-gray-600 rounded transition-colors">
           Hủy
         </button>
-        <button type="submit" :disabled="isSubmitting" class="px-6 py-3 rounded font-bold transition-colors flex items-center justify-center gap-2" :class="isSubmitting ? 'bg-gray-600 text-gray-400 cursor-not-allowed' : 'bg-[#37EC13] text-black hover:bg-green-500'">
+        <button type="submit" :disabled="isSubmitting || isAiRejected" class="px-6 py-3 rounded font-bold transition-colors flex items-center justify-center gap-2" :class="isSubmitting || isAiRejected ? 'bg-gray-600 text-gray-400 cursor-not-allowed' : 'bg-[#37EC13] text-black hover:bg-green-500'">
           <span v-if="isSubmitting" class="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
           {{ isSubmitting ? 'Đang lưu...' : (isEditing ? 'Cập nhật' : 'Nhập kho') }}
         </button>
@@ -111,7 +198,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue';
-import { AlertCircle, Plus } from 'lucide-vue-next';
+import { AlertCircle, Plus, ImagePlus, ScanSearch, CheckCircle2, Trash2 } from 'lucide-vue-next';
 import BaseInput from '@/shared/components/ui/BaseInput.vue';
 import BaseSelect from '@/shared/components/ui/BaseSelect.vue';
 import type { Batch } from '@/features/batches/store';
@@ -139,6 +226,98 @@ const emit = defineEmits(['save', 'cancel-edit']);
 const isEditing = computed(() => !!props.itemToEdit);
 const errorMessage = ref('');
 const isNewIngredient = ref(false);
+
+// ==========================================
+// AI INSPECTION LOGIC
+// ==========================================
+const frontFileInput = ref<HTMLInputElement | null>(null);
+const backFileInput = ref<HTMLInputElement | null>(null);
+const frontImagePreview = ref('');
+const backImagePreview = ref('');
+const frontResultImage = ref('');
+const backResultImage = ref('');
+const frontDefects = ref<any[]>([]);
+const backDefects = ref<any[]>([]);
+const isInspectingFront = ref(false);
+const isInspectingBack = ref(false);
+
+const isAiRejected = computed(() => {
+  return frontDefects.value.length > 0 || backDefects.value.length > 0;
+});
+
+const isAiPassed = computed(() => {
+  return frontResultImage.value !== '' && backResultImage.value !== '' && !isAiRejected.value;
+});
+
+async function handleImageUpload(side: 'front' | 'back', event: Event) {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
+  if (!file) return;
+
+  if (side === 'front') {
+    frontImagePreview.value = URL.createObjectURL(file);
+    frontResultImage.value = '';
+    frontDefects.value = [];
+  } else {
+    backImagePreview.value = URL.createObjectURL(file);
+    backResultImage.value = '';
+    backDefects.value = [];
+  }
+
+  await runInspection(file, side);
+  
+  // Reset input so user can re-upload the same file if needed
+  if (target) target.value = '';
+}
+
+function clearImage(side: 'front' | 'back') {
+  if (side === 'front') {
+    frontImagePreview.value = '';
+    frontResultImage.value = '';
+    frontDefects.value = [];
+    if (frontFileInput.value) frontFileInput.value.value = '';
+  } else {
+    backImagePreview.value = '';
+    backResultImage.value = '';
+    backDefects.value = [];
+    if (backFileInput.value) backFileInput.value.value = '';
+  }
+}
+
+async function runInspection(file: File, side: 'front'|'back') {
+  if (side === 'front') isInspectingFront.value = true;
+  else isInspectingBack.value = true;
+  
+  const uploadData = new FormData();
+  uploadData.append('file', file);
+  
+  try {
+    const response = await fetch('https://thong0710-box-inspection-api.hf.space/inspect-shipment', {
+      method: 'POST',
+      body: uploadData
+    });
+    
+    if (!response.ok) throw new Error('API error');
+    
+    const data = await response.json();
+    if (data.error) throw new Error(data.error);
+    
+    if (side === 'front') {
+      frontDefects.value = data.defects || [];
+      frontResultImage.value = data.image_base64 || '';
+    } else {
+      backDefects.value = data.defects || [];
+      backResultImage.value = data.image_base64 || '';
+    }
+  } catch(e) {
+    console.error("Lỗi AI Inspection:", e);
+    errorMessage.value = 'Lỗi kết nối máy chủ AI. Vui lòng kiểm tra lại.';
+  } finally {
+    if (side === 'front') isInspectingFront.value = false;
+    else isInspectingBack.value = false;
+  }
+}
+// ==========================================
 
 const newIngredient = ref({
   sku: '',
@@ -207,7 +386,17 @@ function resetForm() {
   };
   newIngredient.value = { sku: '', name: '', unit: '', category_code: '' };
   isNewIngredient.value = false;
+  
+  // Reset AI state
+  frontImagePreview.value = '';
+  backImagePreview.value = '';
+  frontResultImage.value = '';
+  backResultImage.value = '';
+  frontDefects.value = [];
+  backDefects.value = [];
 }
+
+
 
 function formatCurrency(n: number) {
   return n.toLocaleString('vi-VN') + ' ₫';

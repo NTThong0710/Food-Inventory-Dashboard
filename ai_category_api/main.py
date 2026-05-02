@@ -59,10 +59,29 @@ def predict_category(food: FoodInput):
         cleaned_text = clean_text(food.name)
         # 2. Chuyển thành số
         vectorized_text = vectorizer.transform([cleaned_text])
+        
+        # Nếu không có từ nào trong input khớp với từ điển của model
+        if vectorized_text.nnz == 0:
+            return {
+                "is_food": False, 
+                "category": "", 
+                "message": "Tên này có vẻ không phải là món ăn hoặc thức uống."
+            }
+            
         # 3. Dự đoán
         prediction = model.predict(vectorized_text)[0]
         
-        return {"category": prediction}
+        # 4. Kiểm tra độ tin cậy (nếu model có hỗ trợ)
+        if hasattr(model, "predict_proba"):
+            proba = model.predict_proba(vectorized_text)[0]
+            if max(proba) < 0.25:
+                return {
+                    "is_food": False, 
+                    "category": "", 
+                    "message": "Tên này có vẻ không phải là món ăn hoặc thức uống."
+                }
+        
+        return {"is_food": True, "category": prediction}
     except Exception as e:
         return {"error": str(e)}
 
