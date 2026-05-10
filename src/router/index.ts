@@ -13,6 +13,7 @@ const router = createRouter({
     {path: '/forgot-password', name: 'forgot-password', component: () => import('../features/auth/views/ForgotPasswordView.vue'), meta: { requiresAuth: false }},
     {path: '/update-password', name: 'update-password', component: () => import('../features/auth/views/UpdatePasswordView.vue'), meta: { requiresAuth: false }},
     {path: '/dashboard', name: 'dashboard', component: () => import('../features/dashboard/views/DashboardView.vue'), meta: { requiresAuth: true, permission: 'dashboard_read' }},
+    {path: '/ai-management', name: 'ai-management', component: () => import('../features/chatbot/views/AiManagementView.vue'), meta: { requiresAuth: true, permission: 'dashboard_read' }},
     {path: '/account', name: 'account', component: () => import('../features/account/views/AccountView.vue'), meta: { requiresAuth: true }},
     {path: '/ingredients', name: 'ingredients', component: () => import('../features/inventory/views/IngredientsView.vue'), meta: { requiresAuth: true, permission: 'ingredient_read' }},
     {path: '/dishes', name: 'dishes', component: () => import('../features/dishes/views/DishesView.vue'), meta: { requiresAuth: true, permission: 'dish_read' }},

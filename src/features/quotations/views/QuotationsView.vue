@@ -202,7 +202,7 @@ onMounted(() => {
 <style>
 .p-datatable-custom .p-datatable-thead > tr > th {
   background: #1A2E16;
-  color: #gray-400;
+  color: gray-400;
   border-bottom: 1px solid #2A362C;
   font-size: 0.75rem;
   text-transform: uppercase;

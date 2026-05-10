@@ -30,6 +30,9 @@
         <router-view />
       </div>
     </main>
+
+    <!-- Chatbot Widget cho nhân viên -->
+    <ChatbotWidget v-if="!isStandalonePage" />
   </div>
 </template>
 
@@ -38,6 +41,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuthStore } from '@/features/auth/store';
 import TopNavbar from '@/shared/components/layout/TopNavbar.vue';
+import ChatbotWidget from '@/features/chatbot/components/ChatbotWidget.vue';
 import Toast from 'primevue/toast';
 
 const route = useRoute();

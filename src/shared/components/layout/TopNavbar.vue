@@ -19,6 +19,15 @@
           Tổng quan
         </router-link>
         <router-link 
+          v-if="authStore.hasPermission('dashboard_read')"
+          to="/ai-management" 
+          class="px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5"
+          :class="$route.path.startsWith('/ai-management') ? 'bg-[#1B5E20] text-[#37EC13] shadow-sm' : 'text-gray-400 hover:text-gray-200 hover:bg-[#1B241D]'"
+        >
+          Quản lý AI
+          <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#37EC13]/20 text-[#37EC13] border border-[#37EC13]/30">Admin</span>
+        </router-link>
+        <router-link 
           v-if="authStore.hasPermission('ingredient_read')"
           to="/ingredients" 
           class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
