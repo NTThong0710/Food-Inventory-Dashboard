@@ -6,7 +6,8 @@ const files = ref<{name: string, size: string}[]>([])
 
 onMounted(async () => {
   try {
-    const res = await fetch('http://localhost:7860/files')
+    const apiUrl = import.meta.env.VITE_AI_CHATBOT_URL || 'http://localhost:7860'
+    const res = await fetch(`${apiUrl}/files`)
     const json = await res.json()
     if (json.status === 'success') {
       files.value = json.data
@@ -33,7 +34,9 @@ const isUploading = ref(false)
 const handleFileSelect = (e: Event) => {
   const target = e.target as HTMLInputElement
   if (target.files && target.files.length > 0) {
-    selectedFile.value = target.files[0]
+    selectedFile.value = target.files[0] || null
+  } else {
+    selectedFile.value = null
   }
 }
 
@@ -45,7 +48,8 @@ const handleUpload = async () => {
   formData.append('file', selectedFile.value)
 
   try {
-    const response = await fetch('http://localhost:7860/upload', {
+    const apiUrl = import.meta.env.VITE_AI_CHATBOT_URL || 'http://localhost:7860'
+    const response = await fetch(`${apiUrl}/upload`, {
       method: 'POST',
       body: formData
     })
@@ -55,7 +59,8 @@ const handleUpload = async () => {
     
     if (json.status === 'success') {
       // Tải lại danh sách file
-      const resFiles = await fetch('http://localhost:7860/files')
+      const apiUrl = import.meta.env.VITE_AI_CHATBOT_URL || 'http://localhost:7860'
+      const resFiles = await fetch(`${apiUrl}/files`)
       const jsonFiles = await resFiles.json()
       if (jsonFiles.status === 'success') {
         files.value = jsonFiles.data

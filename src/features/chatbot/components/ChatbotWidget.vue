@@ -13,7 +13,7 @@ const messagesContainer = ref<HTMLElement | null>(null)
 
 const scrollToBottom = async () => {
   await nextTick()
-  if (messagesContainer.ref) {
+  if (messagesContainer.value) {
     const container = messagesContainer.value as HTMLElement
     if (container) {
        container.scrollTop = container.scrollHeight
@@ -31,7 +31,8 @@ const sendMessage = async () => {
   scrollToBottom()
 
   try {
-    const response = await fetch('http://localhost:7860/chat', {
+    const apiUrl = import.meta.env.VITE_AI_CHATBOT_URL || 'http://localhost:7860';
+    const response = await fetch(`${apiUrl}/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
