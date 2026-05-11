@@ -31,7 +31,7 @@ const sendMessage = async () => {
   scrollToBottom()
 
   try {
-    const apiUrl = import.meta.env.VITE_AI_CHATBOT_URL || 'http://localhost:7860';
+    const apiUrl = import.meta.env.VITE_AI_CHATBOT_URL || 'https://thong0710-food-rag-agenticai.hf.space';
     const response = await fetch(`${apiUrl}/chat`, {
       method: 'POST',
       headers: {
