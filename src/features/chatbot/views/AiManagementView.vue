@@ -6,7 +6,7 @@ const files = ref<{name: string, size: string}[]>([])
 
 onMounted(async () => {
   try {
-    const apiUrl = import.meta.env.VITE_AI_CHATBOT_URL || 'http://localhost:7860'
+    const apiUrl = import.meta.env.VITE_AI_CHATBOT_URL || 'https://thong0710-food-rag-agenticai.hf.space'
     const res = await fetch(`${apiUrl}/files`)
     const json = await res.json()
     if (json.status === 'success') {
@@ -48,7 +48,7 @@ const handleUpload = async () => {
   formData.append('file', selectedFile.value)
 
   try {
-    const apiUrl = import.meta.env.VITE_AI_CHATBOT_URL || 'http://localhost:7860'
+    const apiUrl = import.meta.env.VITE_AI_CHATBOT_URL || 'https://thong0710-food-rag-agenticai.hf.space'
     const response = await fetch(`${apiUrl}/upload`, {
       method: 'POST',
       body: formData
@@ -59,7 +59,7 @@ const handleUpload = async () => {
     
     if (json.status === 'success') {
       // Tải lại danh sách file
-      const apiUrl = import.meta.env.VITE_AI_CHATBOT_URL || 'http://localhost:7860'
+      const apiUrl = import.meta.env.VITE_AI_CHATBOT_URL || 'https://thong0710-food-rag-agenticai.hf.space'
       const resFiles = await fetch(`${apiUrl}/files`)
       const jsonFiles = await resFiles.json()
       if (jsonFiles.status === 'success') {
