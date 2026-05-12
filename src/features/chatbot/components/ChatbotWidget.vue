@@ -5,6 +5,9 @@ import { Bot, X, Send, User, Loader2 } from 'lucide-vue-next'
 const isOpen = ref(false)
 const inputMessage = ref('')
 const isTyping = ref(false)
+// Tạo một session_id ngẫu nhiên cho mỗi phiên chat (để LangGraph nhớ ngữ cảnh)
+const sessionId = ref(`session-${Math.random().toString(36).substring(2, 9)}`)
+
 const messages = ref<{id: number, text: string, sender: 'user' | 'bot'}[]>([
   { id: 1, text: 'Xin chào! Mình là FoodyBot, trợ lý ảo của nhà hàng. Mình có thể giúp gì cho bạn?', sender: 'bot' }
 ])
@@ -15,9 +18,7 @@ const scrollToBottom = async () => {
   await nextTick()
   if (messagesContainer.value) {
     const container = messagesContainer.value as HTMLElement
-    if (container) {
-       container.scrollTop = container.scrollHeight
-    }
+    container.scrollTop = container.scrollHeight
   }
 }
 
@@ -27,35 +28,68 @@ const sendMessage = async () => {
   const userText = inputMessage.value.trim()
   messages.value.push({ id: Date.now(), text: userText, sender: 'user' })
   inputMessage.value = ''
-  isTyping.value = true
+  
+  // Bật trạng thái loading khi vừa gửi xong
+  isTyping.value = true 
   scrollToBottom()
 
+  // 1. Tạo sẵn một tin nhắn rỗng của bot để chuẩn bị hứng data stream
+  const botMessageId = Date.now() + 1
+  messages.value.push({ id: botMessageId, text: '', sender: 'bot' })
+
   try {
-    const apiUrl = import.meta.env.VITE_AI_CHATBOT_URL || 'https://thong0710-food-rag-agenticai.hf.space';
-    const response = await fetch(`${apiUrl}/chat`, {
+    const apiUrl = import.meta.env.VITE_AI_CHATBOT_URL || 'https://thong0710-food-rag-agenticai.hf.space'
+    
+    // Gọi thẳng vào endpoint stream mà mình đã tạo ở backend
+    const response = await fetch(`${apiUrl}/chat/stream`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ message: userText }),
+      // Bổ sung thêm session_id vào payload
+      body: JSON.stringify({ message: userText, session_id: sessionId.value }), 
     })
 
     if (!response.ok) throw new Error('Network response was not ok')
+    if (!response.body) throw new Error('Trình duyệt không hỗ trợ ReadableStream')
+
+    // 2. Tắt hiệu ứng "Đang gõ..." chung vì text chuẩn bị được stream về
+    isTyping.value = false
+
+    // 3. Xử lý luồng Stream
+    const reader = response.body.getReader()
+    const decoder = new TextDecoder('utf-8')
+
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+
+      // Decode mảng byte thành string
+      const chunkText = decoder.decode(value, { stream: true })
+      
+      // Tìm lại cái tin nhắn bot trống lúc nãy và cộng dồn text vào
+      const botMsg = messages.value.find(m => m.id === botMessageId)
+      if (botMsg) {
+        botMsg.text += chunkText
+      }
+      
+      // Auto cuộn xuống khi chữ đang tuôn ra
+      scrollToBottom()
+    }
     
-    const data = await response.json()
-    messages.value.push({ id: Date.now(), text: data.reply, sender: 'bot' })
   } catch (error) {
-    messages.value.push({ 
-      id: Date.now(), 
-      text: 'Xin lỗi, hiện tại mình đang gặp sự cố kết nối. Vui lòng thử lại sau nhé!', 
-      sender: 'bot' 
-    })
+    console.error(error)
+    const botMsg = messages.value.find(m => m.id === botMessageId)
+    if (botMsg) {
+      botMsg.text = '❌ Xin lỗi, hiện tại mình đang gặp sự cố kết nối. Vui lòng thử lại sau nhé!'
+    }
   } finally {
     isTyping.value = false
     scrollToBottom()
   }
 }
 </script>
+
 
 <template>
   <div class="fixed bottom-6 right-6 z-50">

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { Server, Database, Activity, FileText, Upload, Trash2, Key, Bot } from 'lucide-vue-next'
+import { Server, Database, Activity, FileText, Upload, Trash2, Key, Bot, Loader2 } from 'lucide-vue-next'
 
 const files = ref<{name: string, size: string}[]>([])
 
@@ -65,7 +65,7 @@ const handleUpload = async () => {
       if (jsonFiles.status === 'success') {
         files.value = jsonFiles.data
       }
-      alert('Upload tài liệu thành công. AI đã học xong kiến thức mới!')
+      alert(json.message || 'Đã tải tài liệu lên thành công! AI đang tiến hành học ngầm ở background.');
     }
   } catch (error) {
     console.error(error)
