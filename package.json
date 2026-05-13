@@ -29,6 +29,9 @@
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.7",
     "lucide-vue-next": "^0.577.0",
+
+    "markdown-it": "^14.1.1",
+
     "pinia": "^3.0.4",
     "primevue": "^4.5.4",
     "reka-ui": "^2.9.0",
@@ -41,6 +44,9 @@
     "@tailwindcss/vite": "^4.2.1",
     "@tsconfig/node24": "^24.0.4",
     "@types/file-saver": "^2.0.7",
+
+    "@types/markdown-it": "^14.1.2",
+
     "@types/node": "^24.11.0",
     "@vitejs/plugin-vue": "^6.0.4",
     "@vue/eslint-config-typescript": "^14.7.0",

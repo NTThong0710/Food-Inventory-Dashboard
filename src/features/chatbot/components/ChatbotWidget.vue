@@ -2,6 +2,19 @@
 import { ref, nextTick } from 'vue'
 import { Bot, X, Send, User, Loader2 } from 'lucide-vue-next'
 
+import MarkdownIt from 'markdown-it'
+import DOMPurify from 'dompurify'
+
+const md = new MarkdownIt({
+  html: false,
+  breaks: true,
+  linkify: true
+})
+
+const renderMarkdown = (text: string) => {
+  return DOMPurify.sanitize(md.render(text || ''))
+}
+
 const isOpen = ref(false)
 const inputMessage = ref('')
 const isTyping = ref(false)
@@ -141,8 +154,21 @@ const sendMessage = async () => {
               ? 'bg-green-600 text-white rounded-tr-none' 
               : 'bg-white text-gray-800 rounded-tl-none shadow-sm border border-gray-100'"
           >
+
             <!-- Markdown styling có thể áp dụng ở đây nếu cần -->
             <p class="whitespace-pre-wrap">{{ msg.text }}</p>
+
+            <!-- Hiển thị HTML đã chuyển từ markdown (bold, italic) -->
+            <div
+              v-if="msg.sender === 'bot'"
+              class="bot-markdown"
+              v-html="renderMarkdown(msg.text)"
+            ></div>
+
+            <p v-else class="whitespace-pre-wrap">
+              {{ msg.text }}
+            </p>
+
           </div>
         </div>
 
@@ -177,3 +203,24 @@ const sendMessage = async () => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.bot-markdown :deep(p) {
+  margin: 0.35rem 0;
+}
+
+.bot-markdown :deep(ul) {
+  list-style-type: disc;
+  padding-left: 1.25rem;
+  margin: 0.5rem 0;
+}
+
+.bot-markdown :deep(li) {
+  margin: 0.25rem 0;
+}
+
+.bot-markdown :deep(strong) {
+  font-weight: 700;
+}
+</style>
+
