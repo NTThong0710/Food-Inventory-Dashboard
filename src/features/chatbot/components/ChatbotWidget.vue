@@ -155,9 +155,6 @@ const sendMessage = async () => {
               : 'bg-white text-gray-800 rounded-tl-none shadow-sm border border-gray-100'"
           >
 
-            <!-- Markdown styling có thể áp dụng ở đây nếu cần -->
-            <p class="whitespace-pre-wrap">{{ msg.text }}</p>
-
             <!-- Hiển thị HTML đã chuyển từ markdown (bold, italic) -->
             <div
               v-if="msg.sender === 'bot'"
