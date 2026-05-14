@@ -5,29 +5,19 @@ export const useThemeStore = defineStore('theme', () => {
   const isDark = ref(true)
 
   function initTheme() {
-    const saved = localStorage.getItem('theme')
-    if (saved) {
-      isDark.value = saved === 'dark'
-    } else {
-      isDark.value = window.matchMedia('(prefers-color-scheme: dark)').matches
-    }
+    isDark.value = true
     applyTheme()
   }
 
   function toggleTheme() {
-    isDark.value = !isDark.value
+    // Theme switching removed: stay in dark mode.
   }
 
   function applyTheme() {
     const html = document.documentElement
-    if (isDark.value) {
-      html.classList.add('dark')
-      html.classList.remove('light')
-    } else {
-      html.classList.remove('dark')
-      html.classList.add('light')
-    }
-    localStorage.setItem('theme', isDark.value ? 'dark' : 'light')
+    html.classList.add('dark')
+    html.classList.remove('light')
+    localStorage.setItem('theme', 'dark')
   }
 
   watch(isDark, applyTheme)

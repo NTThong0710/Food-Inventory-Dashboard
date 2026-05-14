@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, nextTick } from 'vue'
 import { Bot, X, Send, User, Loader2 } from 'lucide-vue-next'
+
 import MarkdownIt from 'markdown-it'
 import DOMPurify from 'dompurify'
 
@@ -153,6 +154,7 @@ const sendMessage = async () => {
               ? 'bg-green-600 text-white rounded-tr-none' 
               : 'bg-white text-gray-800 rounded-tl-none shadow-sm border border-gray-100'"
           >
+
             <!-- Hiển thị HTML đã chuyển từ markdown (bold, italic) -->
             <div
               v-if="msg.sender === 'bot'"
@@ -163,6 +165,7 @@ const sendMessage = async () => {
             <p v-else class="whitespace-pre-wrap">
               {{ msg.text }}
             </p>
+
           </div>
         </div>
 
@@ -197,6 +200,7 @@ const sendMessage = async () => {
     </div>
   </div>
 </template>
+
 <style scoped>
 .bot-markdown :deep(p) {
   margin: 0.35rem 0;
@@ -216,3 +220,4 @@ const sendMessage = async () => {
   font-weight: 700;
 }
 </style>
+

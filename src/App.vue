@@ -23,7 +23,7 @@
   <Toast/>
 
   <!-- Main App -->
-  <div class="flex flex-col min-h-screen bg-[#132210] font-sans text-white">
+  <div class="flex flex-col min-h-screen bg-background text-foreground font-sans transition-colors duration-300">
     <TopNavbar v-if="!isStandalonePage" />
     <main class="flex-1 overflow-y-auto w-full relative">
       <div :class="isStandalonePage ? 'w-full min-h-full' : 'p-4 md:p-8 w-full max-w-7xl mx-auto'">
@@ -62,7 +62,7 @@ onMounted(() => {
 
 <style>
 :root, body {
-  color-scheme: dark;
+  color-scheme: light dark;
 }
 
 .intro-loader {

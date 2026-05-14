@@ -9,7 +9,7 @@ import { useCurrencyStore } from '@/shared/stores/currency';
 const salesStore = useSalesStore();
 const currencyStore = useCurrencyStore();
 
-const timeFilter = ref<'day' | 'month' | 'year'>('day');
+const timeFilter = ref<'day' | 'month' | 'year'>('month');
 
 onMounted(async () => {
   await salesStore.fetchSales();
@@ -107,7 +107,7 @@ const tooltipTemplate = (d: any) => {
 </script>
 
 <template>
-  <Card class="flex flex-col bg-[#1A241B] border-[#2A362C] shadow-lg rounded-2xl h-full overflow-hidden">
+  <Card class="flex flex-col bg-[#1A2E16] border-[#2A362C] shadow-lg rounded-2xl h-full overflow-hidden">
     <!-- Header -->
     <CardHeader class="pb-2 pt-6 px-6">
       <div class="flex items-start justify-between w-full flex-col sm:flex-row gap-4">

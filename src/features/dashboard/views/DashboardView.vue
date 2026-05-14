@@ -5,7 +5,7 @@
     <div class="card flex justify-center">
       <Toast position="top-center" group="headless" @close="visible = false">
         <template #container="{ message, closeCallback }">
-          <section class="flex flex-col p-5 gap-4 w-87.5 bg-[#1A241B] border border-[#37EC13]/40 shadow-[0_10px_40px_rgba(55,236,19,0.15)] rounded-2xl relative overflow-hidden">
+          <section class="flex flex-col p-5 gap-4 w-87.5 bg-[#37EC13] border border-[#37EC13]/40 shadow-[0_10px_40px_rgba(55,236,19,0.15)] rounded-2xl relative overflow-hidden">
             <div class="flex items-center gap-4">
               <div class="w-10 h-10 rounded-full bg-[#37EC13]/20 flex items-center justify-center shrink-0">
                 <Download class="w-5 h-5 text-[#37EC13]" aria-hidden="true" />
@@ -75,7 +75,7 @@
       </div>
 
       <!-- Inventory Value -->
-      <div class="bg-[#1A241B] p-5 rounded-2xl border border-[#2A362C] flex flex-col gap-3">
+      <div class="bg-[#1A2E16] p-5 rounded-2xl border border-[#2A362C] flex flex-col gap-3">
         <div class="flex justify-between items-center">
           <span class="text-xs font-bold text-[#9ca3af] uppercase tracking-widest">Giá trị tồn kho</span>
           <div class="w-8 h-8 rounded-xl bg-[#37EC13]/10 flex items-center justify-center">
@@ -89,7 +89,7 @@
       </div>
 
       <!-- Avg Dish Cost -->
-      <div class="bg-[#1A241B] p-5 rounded-2xl border border-[#2A362C] flex flex-col gap-3">
+      <div class="bg-[#1A2E16] p-5 rounded-2xl border border-[#2A362C] flex flex-col gap-3">
         <div class="flex justify-between items-center">
           <span class="text-xs font-bold text-[#9ca3af] uppercase tracking-widest">Chi phí món ăn TB</span>
           <div class="w-8 h-8 rounded-xl bg-[#37EC13]/10 flex items-center justify-center">
@@ -119,58 +119,6 @@
 
     </div>
 
-    <!-- Row 3: AI Forecast Chart -->
-    <div class="w-full mb-6 relative">
-       <!-- Gradient glow behind the chart -->
-       <div class="absolute -inset-1 bg-gradient-to-r from-[#37EC13]/20 to-purple-500/20 blur-xl rounded-3xl opacity-50 pointer-events-none"></div>
-       <AIForecastChart class="relative z-10" />
-    </div>
-
-    <!-- Row 4: Recent Dishes Table -->
-    <div class="bg-[#1A2E16] border border-[#2A362C] rounded-2xl overflow-hidden">
-      <div class="px-6 py-5 border-b border-[#2A362C] flex justify-between items-center">
-        <div>
-          <h3 class="font-bold text-white text-base">Món ăn gần đây</h3>
-          <p class="text-[#6b7280] text-xs mt-0.5">Các món mới nhất trên thực đơn</p>
-        </div>
-        <router-link to="/dishes" class="text-xs text-[#37EC13] hover:underline font-medium">Xem tất cả</router-link>
-      </div>
-
-      <!-- Empty state -->
-      <div v-if="dishesStore.items.length === 0" class="flex flex-col items-center justify-center py-12 text-[#6b7280] text-sm">
-        <Utensils class="w-8 h-8 mb-2 opacity-30" aria-hidden="true"/>
-        <p>Chưa có món ăn nào</p>
-      </div>
-
-      <!-- Table -->
-      <template v-else>
-        <!-- Header -->
-        <div class="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr] gap-4 px-6 py-3 bg-[#132210] text-[11px] font-bold text-[#6b7280] uppercase tracking-widest">
-          <div>Tên món ăn</div>
-          <div>Danh mục</div>
-          <div class="text-right">Giá bán</div>
-          <div class="text-right">Chi phí TB</div>
-        </div>
-        <!-- Rows -->
-        <div class="flex flex-col divide-y divide-[#2A362C]/60">
-          <div
-            v-for="dish in recentDishes"
-            :key="dish.dish_code"
-            class="grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr_1fr] gap-2 md:gap-4 px-6 py-4 hover:bg-[#1F2B1E]/60 transition-colors items-center"
-          >
-            <p class="font-semibold text-sm text-[#f3f4f6] truncate">{{ dish.name }}</p>
-            <span class="text-xs font-medium text-[#37EC13]">{{ dish.category || '—' }}</span>
-            <p class="text-sm font-bold text-[#fffbeb] md:text-right tabular-nums">
-              {{ dish.selling_price ? dish.selling_price.toLocaleString('vi-VN') + ' ₫' : '—' }}
-            </p>
-            <p class="text-sm text-[#9ca3af] md:text-right tabular-nums">
-              {{ dish.selling_price ? (dish.selling_price * 0.6).toLocaleString('vi-VN', { maximumFractionDigits: 0 }) + ' ₫' : '—' }}
-            </p>
-          </div>
-        </div>
-      </template>
-    </div>
-
   </div>
 </template>
 
@@ -179,7 +127,6 @@ import { ref, computed, onMounted } from 'vue';
 import { AlignEndVertical, Utensils, DollarSign, Receipt, Download } from 'lucide-vue-next';
 import WebsiteVisitsChart from '@/shared/components/ui/chart/WebsiteVisitsChart.vue';
 import RevenueChart from '@/shared/components/ui/chart/RevenueChart.vue';
-import AIForecastChart from '@/shared/components/ui/chart/AIForecastChart.vue';
 import { useInventoryStore } from '@/features/inventory/store';
 import { useDishesStore } from '@/features/dishes/store';
 import { useSuppliersStore } from '@/features/suppliers/store';

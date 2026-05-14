@@ -1,20 +1,20 @@
 <template>
-  <nav class="w-full bg-[#1A2E16] border-b border-[#2A362C] px-6 h-16 flex items-center justify-between sticky top-0 z-50">
+  <nav class="w-full bg-sidebar border-b border-sidebar-border px-6 h-16 flex items-center justify-between sticky top-0 z-50 transition-colors duration-300">
       <!-- Logo -->
       <router-link to="/" class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-md bg-[#1B5E20] text-white flex justify-center items-center shadow-[0_0_10px_rgba(46,125,50,0.5)]">
+        <div class="w-8 h-8 rounded-md bg-sidebar-accent text-sidebar-accent-foreground flex justify-center items-center shadow-[0_0_10px_rgba(46,125,50,0.5)]">
           <Utensils class="w-4 h-4" aria-hidden="true" />
         </div>
-        <span class="text-white font-bold text-lg tracking-tight">Nova<span class="text-[#37EC13]">Resto</span> <span class="text-gray-300 font-medium text-sm">ERP</span></span>
+        <span class="text-sidebar-foreground font-bold text-lg tracking-tight">Nova<span class="text-accent">Resto</span> <span class="text-muted-foreground font-medium text-sm">ERP</span></span>
       </router-link>
 
       <!-- Nav Links -->
-      <div class="flex md:flex items-center gap-1 bg-[#1A2E16] py-2 px-10 rounded-md">
+      <div class="flex md:flex items-center gap-1 bg-sidebar py-2 px-10 rounded-md transition-colors duration-300">
         <router-link 
           v-if="authStore.hasPermission('dashboard_read')"
           to="/dashboard" 
           class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-          :class="$route.path === '/dashboard' ? 'bg-[#1B5E20] text-[#37EC13] shadow-sm' : 'text-gray-400 hover:text-gray-200 hover:bg-[#1B241D]'"
+          :class="$route.path === '/dashboard' ? 'bg-sidebar-accent text-sidebar-accent-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-secondary'"
         >
           Tổng quan
         </router-link>
@@ -22,16 +22,16 @@
           v-if="authStore.hasPermission('dashboard_read')"
           to="/ai-management" 
           class="px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5"
-          :class="$route.path.startsWith('/ai-management') ? 'bg-[#1B5E20] text-[#37EC13] shadow-sm' : 'text-gray-400 hover:text-gray-200 hover:bg-[#1B241D]'"
+          :class="$route.path.startsWith('/ai-management') ? 'bg-sidebar-accent text-sidebar-accent-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-secondary'"
         >
           Quản lý AI
-          <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#37EC13]/20 text-[#37EC13] border border-[#37EC13]/30">Admin</span>
+          <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-accent/20 text-accent border border-accent/30">Admin</span>
         </router-link>
         <router-link 
           v-if="authStore.hasPermission('ingredient_read')"
           to="/ingredients" 
           class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-          :class="$route.path.startsWith('/ingredients') ? 'bg-[#1B5E20] text-[#37EC13] shadow-sm' : 'text-gray-400 hover:text-gray-200 hover:bg-[#1B241D]'"
+          :class="$route.path.startsWith('/ingredients') ? 'bg-sidebar-accent text-sidebar-accent-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-secondary'"
         >
           Nguyên liệu
         </router-link>
@@ -39,16 +39,16 @@
           v-if="authStore.hasPermission('dish_read')"
           to="/dishes" 
           class="px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5"
-          :class="$route.path.startsWith('/dishes') ? 'bg-[#1B5E20] text-[#37EC13] shadow-sm' : 'text-gray-400 hover:text-gray-200 hover:bg-[#1B241D]'"
+          :class="$route.path.startsWith('/dishes') ? 'bg-sidebar-accent text-sidebar-accent-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-secondary'"
         >
           Món ăn
-          <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#37EC13]/20 text-[#37EC13] border border-[#37EC13]/30">AI</span>
+          <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-accent/20 text-accent border border-accent/30">AI</span>
         </router-link>
         <router-link 
           v-if="authStore.hasPermission('supplier_read')"
           to="/suppliers" 
           class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-          :class="$route.path.startsWith('/suppliers') ? 'bg-[#1B5E20] text-[#37EC13] shadow-sm' : 'text-gray-400 hover:text-gray-200 hover:bg-[#1B241D]'"
+          :class="$route.path.startsWith('/suppliers') ? 'bg-sidebar-accent text-sidebar-accent-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-secondary'"
         >
           Nhà cung cấp
         </router-link>
@@ -60,18 +60,18 @@
           <button 
             type="button"
             class="px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 cursor-pointer"
-            :class="($route.path.startsWith('/sales') || $route.path.startsWith('/batches')) ? 'bg-[#1B5E20] text-[#37EC13] shadow-sm' : 'text-gray-400 hover:text-gray-200 hover:bg-[#1B241D]'"
+            :class="($route.path.startsWith('/sales') || $route.path.startsWith('/batches')) ? 'bg-sidebar-accent text-sidebar-accent-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-secondary'"
           >
             Kho
             <ChevronDown class="w-4 h-4 transition-transform group-hover:rotate-180" />
           </button>
           
-          <div class="absolute top-full left-0 mt-1 w-40 bg-[#1A2E16] border border-[#2A362C] rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden flex flex-col">
+          <div class="absolute top-full left-0 mt-1 w-40 bg-popover border border-border rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden flex flex-col">
             <router-link 
               v-if="authStore.hasPermission('sale_read')"
               to="/sales" 
               class="px-4 py-3 text-sm font-medium transition-colors"
-              :class="$route.path.startsWith('/sales') ? 'bg-[#1B5E20] text-[#37EC13]' : 'text-gray-400 hover:text-gray-200 hover:bg-[#1B241D]'"
+              :class="$route.path.startsWith('/sales') ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-secondary'"
             >
               Xuất kho
             </router-link>
@@ -79,10 +79,10 @@
               v-if="authStore.hasPermission('batch_read')"
               to="/batches" 
               class="px-4 py-3 text-sm font-medium transition-colors flex items-center justify-between"
-              :class="$route.path.startsWith('/batches') ? 'bg-[#1B5E20] text-[#37EC13]' : 'text-gray-400 hover:text-gray-200 hover:bg-[#1B241D]'"
+              :class="$route.path.startsWith('/batches') ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-secondary'"
             >
               Nhập kho
-              <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#37EC13]/20 text-[#37EC13] border border-[#37EC13]/30">AI</span>
+              <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-accent/20 text-accent border border-accent/30">AI</span>
             </router-link>
           </div>
         </div>
@@ -94,18 +94,18 @@
           <button
             type="button"
             class="px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 cursor-pointer"
-            :class="($route.path.startsWith('/pos') || $route.path.startsWith('/table-map') || $route.path.startsWith('/quotations')) ? 'bg-[#1B5E20] text-[#37EC13] shadow-sm' : 'text-gray-400 hover:text-gray-200 hover:bg-[#1B241D]'"
+            :class="($route.path.startsWith('/pos') || $route.path.startsWith('/table-map') || $route.path.startsWith('/quotations')) ? 'bg-sidebar-accent text-sidebar-accent-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-secondary'"
           >
             Phục vụ
             <ChevronDown class="w-4 h-4 transition-transform group-hover:rotate-180" />
           </button>
 
-          <div class="absolute top-full left-0 mt-1 w-44 bg-[#1A2E16] border border-[#2A362C] rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden flex flex-col">
+          <div class="absolute top-full left-0 mt-1 w-44 bg-popover border border-border rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden flex flex-col">
             <router-link
               v-if="authStore.hasPermission('pos_read')"
               to="/pos"
               class="flex items-center gap-2.5 px-4 py-3 text-sm font-medium transition-colors"
-              :class="$route.path === '/pos' ? 'bg-[#1B5E20] text-[#37EC13]' : 'text-gray-400 hover:text-gray-200 hover:bg-[#1B241D]'"
+              :class="$route.path === '/pos' ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-secondary'"
             >
               <MonitorSmartphone class="w-4 h-4" /> Order POS
             </router-link>
@@ -113,7 +113,7 @@
               v-if="authStore.hasPermission('table_read')"
               to="/table-map"
               class="flex items-center gap-2.5 px-4 py-3 text-sm font-medium transition-colors"
-              :class="$route.path.startsWith('/table-map') ? 'bg-[#1B5E20] text-[#37EC13]' : 'text-gray-400 hover:text-gray-200 hover:bg-[#1B241D]'"
+              :class="$route.path.startsWith('/table-map') ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-secondary'"
             >
               <LayoutGrid class="w-4 h-4" /> Sơ đồ Bàn
             </router-link>
@@ -121,19 +121,12 @@
               v-if="authStore.hasPermission('booking_read')"
               to="/quotations"
               class="flex items-center gap-2.5 px-4 py-3 text-sm font-medium transition-colors"
-              :class="$route.path.startsWith('/quotations') ? 'bg-[#1B5E20] text-[#37EC13]' : 'text-gray-400 hover:text-gray-200 hover:bg-[#1B241D]'"
+              :class="$route.path.startsWith('/quotations') ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-secondary'"
             >
               <FileText class="w-4 h-4" /> Báo giá
             </router-link>
           </div>
         </div>
-        <!-- <router-link 
-          to="/account" 
-          class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-          :class="$route.path.startsWith('/account') ? 'bg-[#1B5E20] text-[#37EC13] shadow-sm' : 'text-gray-400 hover:text-gray-200 hover:bg-[#1B241D]'"
-        >
-          Cài đặt
-        </router-link> -->
       </div>
 
    
@@ -141,21 +134,12 @@
     <!-- Profile & Theme Toggle -->
     <div class="flex items-center gap-4">
       <div class="flex-col text-right hidden md:block">
-        <span class="text-sm font-medium text-white">{{ username }}</span>
+        <span class="text-sm font-medium text-sidebar-foreground">{{ username }}</span>
         <!-- <span class="text-xs text-gray-400">{{ authStore.userEmail }}</span> -->
       </div>
-      <router-link to="/account" class="w-10 h-10 rounded-full bg-[#1B5E20] border-2 border-[#37EC13] flex items-center justify-center text-white font-bold cursor-pointer hover:bg-[#2a7c2e] transition-colors" :title="username">
+      <router-link to="/account" class="w-10 h-10 rounded-full bg-sidebar-accent border-2 border-sidebar-ring flex items-center justify-center text-sidebar-accent-foreground font-bold cursor-pointer hover:bg-accent/90 transition-colors" :title="username">
         {{ userInitial }}
       </router-link>
-      <!-- Theme Toggle Button -->
-      <button
-        @click="toggleTheme"
-        class="p-2 text-gray-400 hover:text-gray-200 hover:bg-[#1B241D] rounded-lg transition-colors relative transition-theme-btn"
-        :title="themeStore.isDark ? 'Chế độ sáng' : 'Chế độ tối'"
-      >
-        <Sun v-if="themeStore.isDark" class="w-5 h-5 text-yellow-400" />
-        <Moon v-else class="w-5 h-5 text-blue-400" />
-      </button>
       <button @click="handleLogout" class="p-2 text-red-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors" title="Đăng xuất" aria-label="Sign Out">
         <LogOut class="w-5 h-5" aria-hidden="true" />
       </button>
@@ -166,14 +150,12 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
 import { computed, nextTick } from 'vue'
-import { Utensils, LogOut, Sun, Moon, ChevronDown, MonitorSmartphone, LayoutGrid, FileText } from 'lucide-vue-next'
+import { Utensils, LogOut, ChevronDown, MonitorSmartphone, LayoutGrid, FileText } from 'lucide-vue-next'
 import { useAuthStore } from '@/features/auth/store'
-import { useThemeStore } from '@/shared/stores/theme'
 
 const $route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
-const themeStore = useThemeStore()
 
 const username = computed(() => {
   return authStore.displayName

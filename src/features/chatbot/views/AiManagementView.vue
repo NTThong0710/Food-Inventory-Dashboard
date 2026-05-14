@@ -91,7 +91,7 @@ const handleUpload = async () => {
       <div class="flex gap-2">
         <span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm font-medium border border-green-500/30 flex items-center gap-1.5">
           <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-          Bot đang hoạt động
+          Đang hoạt động
         </span>
       </div>
     </div>
@@ -99,7 +99,6 @@ const handleUpload = async () => {
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <div class="bg-[#1A2E16] border border-[#2A362C] rounded-2xl p-5 shadow-lg relative overflow-hidden">
-        <div class="absolute right-0 top-0 w-24 h-24 bg-green-500/5 rounded-bl-full"></div>
         <div class="flex justify-between items-start">
           <div>
             <p class="text-gray-400 text-sm font-medium">Tổng truy vấn tháng này</p>
@@ -115,7 +114,6 @@ const handleUpload = async () => {
       </div>
 
       <div class="bg-[#1A2E16] border border-[#2A362C] rounded-2xl p-5 shadow-lg relative overflow-hidden">
-        <div class="absolute right-0 top-0 w-24 h-24 bg-purple-500/5 rounded-bl-full"></div>
         <div class="flex justify-between items-start">
           <div>
             <p class="text-gray-400 text-sm font-medium">Tài liệu RAG (Knowledge)</p>
@@ -131,7 +129,6 @@ const handleUpload = async () => {
       </div>
 
       <div class="bg-[#1A2E16] border border-[#2A362C] rounded-2xl p-5 shadow-lg relative overflow-hidden">
-        <div class="absolute right-0 top-0 w-24 h-24 bg-yellow-500/5 rounded-bl-full"></div>
         <div class="flex justify-between items-start">
           <div>
             <p class="text-gray-400 text-sm font-medium">Độ chính xác RAG</p>
@@ -148,36 +145,25 @@ const handleUpload = async () => {
     </div>
 
     <!-- Main Content -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      
-      <!-- Chart Column (Span 2) -->
-      <div class="lg:col-span-2 bg-[#1A2E16] border border-[#2A362C] rounded-2xl p-6 shadow-lg">
-        <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
-          Biểu đồ Truy vấn (7 ngày qua)
-        </h3>
-        <!-- CSS Bar Chart -->
-        <div class="h-64 flex items-end justify-between gap-2 px-2 mt-4 pb-2 border-b border-[#2A362C]">
-          <div v-for="data in chartData" :key="data.day" class="w-full flex flex-col items-center gap-2 relative group">
-            <!-- Tooltip -->
-            <div class="absolute -top-8 bg-black/80 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-              {{ data.queries }}
-            </div>
-            <!-- Bar -->
-            <div 
-              class="w-full max-w-[40px] bg-gradient-to-t from-[#1B5E20] to-[#37EC13] rounded-t-sm transition-all duration-500 group-hover:opacity-80"
-              :style="{ height: data.height }"
-            ></div>
-            <!-- Label -->
-            <span class="text-xs text-gray-400 mt-2">{{ data.day }}</span>
-          </div>
+      <div class="flex w-full gap-6">
+        <div class="flex-1 bg-[#1A2E16] border border-[#2A362C] rounded-2xl p-6 shadow-lg">
+          <h3 class="text-lg font-bold text-white mb-4">Tài liệu trong não AI</h3>
+          <ul class="space-y-3">
+            <li v-for="file in files" :key="file.name" class="flex items-center justify-between p-3 bg-[#0C160A] rounded-lg border border-[#2A362C]">
+              <div class="flex items-center gap-3 overflow-hidden">
+                <FileText class="w-5 h-5 text-gray-400 shrink-0" />
+                <div class="truncate">
+                  <p class="text-sm font-medium text-gray-200 truncate">{{ file.name }}</p>
+                  <p class="text-xs text-gray-500">{{ file.size }}</p>
+                </div>
+              </div>
+              <button class="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors shrink-0">
+                <Trash2 class="w-4 h-4" />
+              </button>
+            </li>
+          </ul>
         </div>
-      </div>
-
-      <!-- Config & Data Column -->
-      <div class="space-y-6">
-        
-        <!-- Upload Section -->
-        <div class="bg-[#1A2E16] border border-[#2A362C] rounded-2xl p-6 shadow-lg">
+                <div class="flex-1 bg-[#1A2E16] border border-[#2A362C] rounded-2xl p-6 shadow-lg">
           <h3 class="text-lg font-bold text-white mb-4">Huấn luyện AI (Thêm tài liệu)</h3>
           <p class="text-xs text-gray-400 mb-4">Upload file PDF, TXT, CSV để thêm kiến thức cho FoodyBot.</p>
           
@@ -200,25 +186,11 @@ const handleUpload = async () => {
         </div>
 
         <!-- File List -->
-        <div class="bg-[#1A2E16] border border-[#2A362C] rounded-2xl p-6 shadow-lg">
-          <h3 class="text-lg font-bold text-white mb-4">Tài liệu trong não AI</h3>
-          <ul class="space-y-3">
-            <li v-for="file in files" :key="file.name" class="flex items-center justify-between p-3 bg-[#0C160A] rounded-lg border border-[#2A362C]">
-              <div class="flex items-center gap-3 overflow-hidden">
-                <FileText class="w-5 h-5 text-gray-400 shrink-0" />
-                <div class="truncate">
-                  <p class="text-sm font-medium text-gray-200 truncate">{{ file.name }}</p>
-                  <p class="text-xs text-gray-500">{{ file.size }}</p>
-                </div>
-              </div>
-              <button class="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors shrink-0">
-                <Trash2 class="w-4 h-4" />
-              </button>
-            </li>
-          </ul>
-        </div>
+        
+      </div>  
+        <!-- Upload Section -->
+
 
       </div>
-    </div>
-  </div>
+
 </template>

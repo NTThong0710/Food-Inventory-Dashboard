@@ -7,7 +7,7 @@
     <!-- Navbar -->
     <nav class="relative z-10 px-6 py-4 flex items-center justify-between max-w-7xl mx-auto w-full">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#4ade80] to-[#22c55e] flex items-center justify-center text-[#0C160A]">
+        <div class="w-10 h-10 rounded-full bg-linear-to-br from-[#4ade80] to-[#22c55e] flex items-center justify-center text-[#0C160A]">
           <ChefHat class="w-6 h-6" />
         </div>
         <h1 class="text-xl font-bold tracking-wider">NOVA<span class="text-[#4ade80]">RESTO</span></h1>
@@ -15,7 +15,7 @@
       
       <div class="flex items-center">
         <router-link to="/dashboard" class="group relative px-6 py-2.5 rounded-full overflow-hidden bg-[#132210] border border-[#22c55e]/30 hover:border-[#4ade80]/60 transition-all duration-300">
-          <div class="absolute inset-0 bg-gradient-to-r from-[#4ade80]/10 to-transparent translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"></div>
+          <div class="absolute inset-0 bg-linear-to-r from-[#4ade80]/10 to-transparent translate-x-full group-hover:translate-x-0 transition-transform duration-500"></div>
           <span class="relative z-10 flex items-center gap-2 text-sm font-medium">
             Tới Trang Quản Trị
             <ArrowRight class="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -34,7 +34,7 @@
         
         <h2 class="text-5xl lg:text-7xl font-extrabold leading-tight mb-8 animate-fade-in-up animation-delay-100">
           Nâng Tầm Đẳng Cấp <br class="hidden md:block"/>
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#4ade80] to-[#22c55e]">
+          <span class="text-transparent bg-clip-text bg-linear-to-r from-[#4ade80] to-[#22c55e]">
             Nhà Hàng Của Bạn
           </span>
         </h2>

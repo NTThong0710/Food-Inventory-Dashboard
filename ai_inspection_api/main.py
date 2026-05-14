@@ -49,7 +49,7 @@ async def inspect_shipment(file: UploadFile = File(...)):
         image = Image.open(io.BytesIO(contents))
         
         # Chạy model YOLO dự đoán
-        results = yolo_model.predict(source=image, conf=0.4)
+        results = yolo_model.predict(source=image, conf=0.1)
         result = results[0]
         
         defects = []
