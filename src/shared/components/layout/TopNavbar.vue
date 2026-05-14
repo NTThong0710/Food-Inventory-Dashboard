@@ -152,6 +152,9 @@ import { useRoute, useRouter } from 'vue-router'
 import { computed, nextTick } from 'vue'
 import { Utensils, LogOut, ChevronDown, MonitorSmartphone, LayoutGrid, FileText } from 'lucide-vue-next'
 import { useAuthStore } from '@/features/auth/store'
+import { useThemeStore } from "@/shared/stores/theme";
+
+const themeStore = useThemeStore();
 
 const $route = useRoute()
 const router = useRouter()
