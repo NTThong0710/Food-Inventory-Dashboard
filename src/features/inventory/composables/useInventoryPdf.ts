@@ -129,7 +129,7 @@ export async function exportInventoryPdf(
   const lowStockCount = items.filter(i => getStockStatus(i.quantity) === 'low').length;
   const expiredCount = items.filter(i => getExpiryStatus(i.expiry_date) === 'expired').length;
   const expiringSoonCount = items.filter(i => getExpiryStatus(i.expiry_date) === 'soon').length;
-  const categories = [...new Set(items.map(i => i.category))].length;
+  const categories = new Set(items.map(i => i.category)).size;
 
   interface StatCard { label: string; value: string; color: [number, number, number] }
   const cards: StatCard[] = [
